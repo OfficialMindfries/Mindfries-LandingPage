@@ -37,7 +37,7 @@ export default function WaitlistForm({ compact = false }: { compact?: boolean })
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-3 rounded-xl border border-accent-soft bg-accent-soft px-5 py-4"
           >
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-sm text-[#04120e]">
+            <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-sm text-on-accent">
               ✓
             </span>
             <div>
@@ -66,13 +66,13 @@ export default function WaitlistForm({ compact = false }: { compact?: boolean })
                 placeholder="you@company.com"
                 aria-label="Work email"
                 className={`h-12 flex-1 rounded-xl border bg-surface px-4 text-sm text-ink outline-none transition-colors placeholder:text-faint focus:border-hair-bright ${
-                  state === "error" ? "border-red-400/60" : "border-hair"
+                  state === "error" ? "border-red-500/60" : "border-hair"
                 }`}
               />
               <button
                 type="submit"
                 disabled={state === "loading"}
-                className="group flex h-12 items-center justify-center gap-2 rounded-xl bg-accent px-5 text-sm font-medium text-[#04120e] transition-opacity hover:opacity-90 disabled:opacity-60"
+                className="group flex h-12 items-center justify-center gap-2 rounded-xl bg-accent px-5 text-sm font-medium text-on-accent transition-opacity hover:opacity-90 disabled:opacity-60"
               >
                 {state === "loading" ? "Sending…" : "Request early access"}
                 {state !== "loading" && (
@@ -86,13 +86,13 @@ export default function WaitlistForm({ compact = false }: { compact?: boolean })
                 type="checkbox"
                 checked={partner}
                 onChange={(e) => setPartner(e.target.checked)}
-                className="h-4 w-4 accent-[#3de1c4]"
+                className="h-4 w-4 accent-[#1b3a6b]"
               />
               We&apos;re hiring engineers now — interested in being a design partner.
             </label>
 
             {state === "error" && (
-              <p className="text-xs text-red-400">
+              <p className="text-xs text-red-600">
                 Please enter a valid email and try again.
               </p>
             )}

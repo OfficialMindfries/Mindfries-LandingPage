@@ -41,7 +41,7 @@ export default function Pillars() {
             </p>
             <div className="mono mt-6 space-y-1.5 rounded-xl border border-hair bg-bg/60 p-4 text-sm">
               <div className="text-faint"># keyword match</div>
-              <div className="text-red-400/70">&ldquo;LangGraph&rdquo; ≠ &ldquo;AI agent development&rdquo; → rejected</div>
+              <div className="text-red-600/70">&ldquo;LangGraph&rdquo; ≠ &ldquo;AI agent development&rdquo; → rejected</div>
               <div className="pt-2 text-faint"># mindfries</div>
               <div className="text-accent">
                 semantic + evidence → strong match, 2yr production history

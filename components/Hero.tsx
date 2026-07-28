@@ -37,7 +37,7 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0 z-0 opacity-70 transition-opacity"
         style={{
           background:
-            "radial-gradient(28rem 28rem at var(--mx,50%) var(--my,10%), rgba(61,225,196,0.08), transparent 70%)",
+            "radial-gradient(28rem 28rem at var(--mx,50%) var(--my,10%), rgba(27,58,107,0.07), transparent 70%)",
         }}
       />
 
@@ -112,7 +112,7 @@ export default function Hero() {
           className="relative"
           style={{ perspective: 1200 }}
         >
-          <div className="hair-card relative overflow-hidden rounded-2xl p-6 shadow-2xl shadow-black/50">
+          <div className="hair-card relative overflow-hidden rounded-2xl p-6 shadow-2xl shadow-black/10">
             <div className="flex items-center justify-between border-b border-hair pb-4">
               <div className="flex items-center gap-3">
                 <div className="grid h-10 w-10 place-items-center rounded-full border border-hair-bright bg-surface-2 text-sm text-accent">
@@ -171,7 +171,7 @@ export default function Hero() {
           </div>
 
           {/* floating accent chip */}
-          <div className="absolute -left-4 -top-4 hidden rounded-lg border border-hair-bright bg-surface px-3 py-2 shadow-xl shadow-black/40 sm:block">
+          <div className="absolute -left-4 -top-4 hidden rounded-lg border border-hair-bright bg-surface px-3 py-2 shadow-xl shadow-black/10 sm:block">
             <span className="mono text-xs text-dim">evidence read from</span>
             <span className="mono ml-2 text-xs text-accent">github ↗</span>
           </div>

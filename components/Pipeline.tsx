@@ -46,17 +46,17 @@ function Row({ c, p }: { c: Cand; p: MotionValue<number> }) {
   const borderA = useTransform(
     p,
     [0.24, 0.44, 0.82, 0.9],
-    [0.06, 0.14, 0.14, c.rank === 0 ? 0.55 : 0.14],
+    [0.08, 0.16, 0.16, c.rank === 0 ? 0.42 : 0.16],
   );
-  const border = useMotionTemplate`1px solid rgba(255,255,255,${borderA})`;
+  const border = useMotionTemplate`1px solid rgba(23,20,15,${borderA})`;
   const bgA = useTransform(p, [0.82, 0.92], [0, c.rank === 0 ? 0.06 : 0]);
-  const bg = useMotionTemplate`rgba(61,225,196,${bgA})`;
+  const bg = useMotionTemplate`rgba(27,58,107,${bgA})`;
   const rankOpacity = useTransform(p, [0.8, 0.92], [0, 1]);
 
   return (
     <motion.div
       style={{ y, border, background: bg }}
-      className="absolute inset-x-0 flex h-[58px] items-center gap-3 rounded-xl bg-surface/40 px-4 backdrop-blur-sm"
+      className="absolute inset-x-0 flex h-[58px] items-center gap-3 rounded-xl bg-bg/70 px-4 backdrop-blur-sm"
     >
       <motion.span style={{ opacity: rankOpacity }} className="mono w-6 text-sm text-accent">
         #{c.rank + 1}
@@ -99,8 +99,8 @@ function Terminal({ p }: { p: MotionValue<number> }) {
     >
       <div className="hair-card overflow-hidden rounded-xl">
         <div className="flex items-center gap-2 border-b border-hair bg-surface-2 px-4 py-2.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-          <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
+          <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
+          <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
           <span className="h-2.5 w-2.5 rounded-full bg-accent/60" />
           <span className="mono ml-2 text-xs text-faint">
             sandbox · payments-service/refund.ts
@@ -108,7 +108,7 @@ function Terminal({ p }: { p: MotionValue<number> }) {
         </div>
         <div className="mono space-y-1.5 p-4 text-[0.78rem] leading-relaxed">
           <motion.div style={{ opacity: l1 }} className="text-dim">
-            <span className="text-red-400/80">- if (amount &gt; balance) return;</span>
+            <span className="text-red-600/80">- if (amount &gt; balance) return;</span>
           </motion.div>
           <motion.div style={{ opacity: l2 }} className="text-dim">
             <span className="text-accent">+ if (amount &gt; balance) throw new RefundError();</span>
