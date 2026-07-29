@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Reveal, SectionLabel, stagger, item } from "./primitives";
+import { Reveal, stagger, item } from "./primitives";
 
 const founders = [
   { name: "Hiranya Patil", role: "Co-founder · CEO", now: "AI Intern, Amipi" },
@@ -26,22 +26,24 @@ function Avatar({ name }: { name: string }) {
 
 export default function Team() {
   return (
-    <section id="team" className="relative py-28">
-      <div className="mx-auto max-w-6xl px-6">
-        <Reveal>
-          <SectionLabel index="05">The team</SectionLabel>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <h2 className="mt-6 max-w-2xl text-balance text-4xl font-medium leading-tight tracking-tight text-ink sm:text-5xl">
-            Engineers building the hiring tool they wished existed.
-          </h2>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <p className="mt-5 max-w-2xl text-lg text-dim">
-            A four-person founding team out of the Sitare University company-building
-            programme, backed by operators who&apos;ve built at real scale.
-          </p>
-        </Reveal>
+    <section id="team" className="relative px-6 py-16">
+      <div className="mx-auto max-w-6xl">
+        <div className="text-center">
+          <Reveal>
+            <span className="eyebrow">the team</span>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h2 className="mx-auto mt-4 max-w-2xl text-balance text-4xl text-ink sm:text-5xl">
+              Engineers building the hiring tool they wished existed.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <p className="mx-auto mt-4 max-w-2xl text-dim">
+              A four-person founding team out of the Sitare University company-building
+              programme, backed by operators who&apos;ve built at real scale.
+            </p>
+          </Reveal>
+        </div>
 
         <motion.div
           variants={stagger}

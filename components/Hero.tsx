@@ -1,186 +1,136 @@
 "use client";
 
 import { motion } from "framer-motion";
-import WaitlistForm from "./WaitlistForm";
 
-const partners = ["AlgoScale", "GoQii", "ScInter", "VXT AI"];
-
-// Node graph: a hub tile at center, satellites positioned by
-// percentage. Same coords drive the SVG connectors (viewBox is
-// 0..100 with non-uniform scaling so 1 unit == 1% on each axis).
-type Node = {
-  x: number;
-  y: number;
-  size: number;
-  tile: string;
-  glyph: React.ReactNode;
+// Floating candidate cards flanking the centered headline. No stock
+// photos — each card is a product artifact: gradient portrait, handle,
+// match score. That reads truer for a hiring product anyway.
+type Card = {
+  handle: string;
+  role: string;
+  score: number;
+  grad: string;
   float: string;
-  hub?: boolean;
+  shift: string;
 };
 
-const HUB = { x: 50, y: 52 };
-
-const nodes: Node[] = [
-  { x: 50, y: 52, size: 76, tile: "tile-violet", glyph: <Check />, float: "float-b", hub: true },
-  { x: 17, y: 40, size: 54, tile: "tile-cyan", glyph: <Code />, float: "float-a" },
-  { x: 30, y: 82, size: 50, tile: "tile-yellow", glyph: "★", float: "float-c" },
-  { x: 71, y: 24, size: 54, tile: "tile-coral", glyph: <Bolt />, float: "float-a" },
-  { x: 84, y: 58, size: 50, tile: "tile-violet", glyph: "PN", float: "float-c" },
-  { x: 66, y: 84, size: 46, tile: "tile-coral", glyph: "DO", float: "float-b" },
+const left: Card[] = [
+  { handle: "@priya-nair", role: "backend", score: 94, grad: "from-violet-400 to-violet-600", float: "float-a", shift: "mt-0" },
+  { handle: "@d-okafor", role: "platform", score: 89, grad: "from-orange-300 to-rose-500", float: "float-c", shift: "-mt-2 mr-8" },
+  { handle: "@sana-q", role: "backend", score: 71, grad: "from-amber-300 to-orange-500", float: "float-b", shift: "mt-2" },
+];
+const right: Card[] = [
+  { handle: "@leiwang", role: "ml", score: 84, grad: "from-sky-300 to-cyan-500", float: "float-b", shift: "mt-0" },
+  { handle: "@t-mendes", role: "fullstack", score: 78, grad: "from-fuchsia-300 to-violet-500", float: "float-a", shift: "-mt-2 ml-8" },
+  { handle: "@marco-b", role: "frontend", score: 63, grad: "from-emerald-300 to-teal-500", float: "float-c", shift: "mt-2" },
 ];
 
-function Check() {
+function PortraitCard({ c, i, dir }: { c: Card; i: number; dir: number }) {
+  const initials = c.handle.replace("@", "").split("-").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   return (
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  );
-}
-function Code() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m16 18 6-6-6-6M8 6l-6 6 6 6" />
-    </svg>
-  );
-}
-function Bolt() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
-    </svg>
-  );
-}
-
-function NodeGraph() {
-  return (
-    <div className="relative mx-auto mb-10 h-64 w-full max-w-3xl sm:h-72">
-      {/* connectors */}
-      <svg
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        className="absolute inset-0 h-full w-full"
-      >
-        {nodes
-          .filter((n) => !n.hub)
-          .map((n, i) => (
-            <motion.line
-              key={i}
-              x1={HUB.x}
-              y1={HUB.y}
-              x2={n.x}
-              y2={n.y}
-              stroke="rgba(20,22,30,0.14)"
-              strokeWidth="0.35"
-              strokeDasharray="1.4 1.4"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.9, delay: 0.5 + i * 0.12, ease: "easeInOut" }}
-            />
-          ))}
-      </svg>
-
-      {/* moving pulse dots along each connector */}
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-        {nodes
-          .filter((n) => !n.hub)
-          .map((n, i) => (
-            <motion.circle
-              key={i}
-              r="0.7"
-              fill="#7c3aed"
-              initial={{ cx: HUB.x, cy: HUB.y, opacity: 0 }}
-              animate={{ cx: [HUB.x, n.x], cy: [HUB.y, n.y], opacity: [0, 1, 0] }}
-              transition={{ duration: 2.4, delay: 1.4 + i * 0.3, repeat: Infinity, repeatDelay: 1.6, ease: "easeInOut" }}
-            />
-          ))}
-      </svg>
-
-      {/* tiles */}
-      {nodes.map((n, i) => (
-        <motion.div
-          key={i}
-          className="absolute"
-          style={{ left: `${n.x}%`, top: `${n.y}%`, translateX: "-50%", translateY: "-50%" }}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 + i * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
-        >
-          <div
-            className={`tile ${n.tile} ${n.float} text-sm font-bold`}
-            style={{ width: n.size, height: n.size }}
-          >
-            {n.glyph}
-          </div>
-        </motion.div>
-      ))}
-    </div>
+    <motion.div
+      initial={{ opacity: 0, x: dir * 40, scale: 0.9 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ duration: 0.7, delay: 0.3 + i * 0.14, ease: [0.22, 1, 0.36, 1] }}
+      className={`${c.shift} ${c.float}`}
+    >
+      <div className="hair-card w-44 overflow-hidden !rounded-2xl p-0">
+        <div className={`relative flex h-24 items-center justify-center bg-gradient-to-br ${c.grad}`}>
+          <span className="text-2xl font-bold text-white/95">{initials}</span>
+          <span className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[0.7rem] font-bold text-ink">
+            {c.score}
+          </span>
+        </div>
+        <div className="px-3.5 py-3">
+          <div className="mono text-sm text-ink">{c.handle}</div>
+          <div className="mono text-[0.7rem] text-faint">{c.role}</div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
 export default function Hero() {
   return (
-    <section id="top" className="ambient relative overflow-hidden px-6 pb-20 pt-28 sm:pt-36">
-      <div className="mx-auto max-w-4xl text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-hair bg-surface/70 px-4 py-1.5"
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-          <span className="eyebrow !tracking-[0.18em]">AI hiring intelligence</span>
-        </motion.div>
+    <section id="top" className="ambient relative overflow-hidden px-6 pb-16 pt-28 sm:pt-32">
+      <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[1fr_auto_1fr]">
+        {/* left floating cards */}
+        <div className="hidden flex-col items-end gap-5 lg:flex">
+          {left.map((c, i) => (
+            <PortraitCard key={c.handle} c={c} i={i} dir={-1} />
+          ))}
+        </div>
 
-        <NodeGraph />
+        {/* centered copy */}
+        <div className="mx-auto max-w-md text-center">
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            className="mx-auto mb-7 h-14 w-14"
+          >
+            <div className="tile tile-violet float-b h-14 w-14">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </div>
+          </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20, filter: "blur(12px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto max-w-3xl text-balance text-5xl text-ink sm:text-6xl lg:text-7xl"
-        >
-          We rank engineers on what they{" "}
-          <span className="accent-text">actually built</span>.
-        </motion.h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 18, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="text-balance text-5xl text-ink sm:text-6xl"
+          >
+            We rank engineers on what they{" "}
+            <span className="accent-text">actually built</span>.
+          </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.35 }}
-          className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-dim"
-        >
-          Mindfries reads real work — GitHub, portfolios, live code — then runs an
-          adaptive assessment on a real codebase. You get a ranked shortlist with a
-          plain-English reason for every name.{" "}
-          <span className="font-medium text-ink">You decide.</span>
-        </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="mx-auto mt-5 max-w-sm text-base leading-relaxed text-dim"
+          >
+            Mindfries reads real work — GitHub, portfolios, live code — then scores an
+            adaptive assessment on a real codebase. A ranked shortlist with a reason for
+            every name.
+          </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="mx-auto mt-9 flex justify-center"
-        >
-          <WaitlistForm compact />
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.45 }}
+            className="mt-8 flex items-center justify-center gap-3"
+          >
+            <a
+              href="#access"
+              className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-on-accent shadow-[0_12px_28px_-10px_rgba(124,58,237,0.7)] transition-transform hover:-translate-y-0.5"
+            >
+              Request early access
+            </a>
+            <a
+              href="#how"
+              className="rounded-full border border-hair-bright bg-surface px-5 py-3 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
+            >
+              See how it works
+            </a>
+          </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
-          className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
-        >
-          <span className="mono text-xs uppercase tracking-widest text-faint">
-            built with design partners
-          </span>
-          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-            {partners.map((p) => (
-              <span key={p} className="text-sm font-medium text-dim">
-                {p}
-              </span>
-            ))}
-          </div>
-        </motion.div>
+        {/* right floating cards */}
+        <div className="hidden flex-col items-start gap-5 lg:flex">
+          {right.map((c, i) => (
+            <PortraitCard key={c.handle} c={c} i={i} dir={1} />
+          ))}
+        </div>
+      </div>
+
+      {/* mobile: a compact card row so it's not empty */}
+      <div className="mt-12 flex justify-center gap-4 lg:hidden">
+        {[left[0], right[0]].map((c, i) => (
+          <PortraitCard key={c.handle} c={c} i={i} dir={i === 0 ? -1 : 1} />
+        ))}
       </div>
     </section>
   );

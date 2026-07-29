@@ -5,7 +5,7 @@ import WaitlistForm from "./WaitlistForm";
 
 export default function CTA() {
   return (
-    <section id="access" className="relative overflow-hidden border-t border-hair">
+    <section id="access" className="relative overflow-hidden">
       <div className="ambient pointer-events-none absolute inset-0" />
       <div className="relative mx-auto max-w-3xl px-6 py-32 text-center">
         <Reveal>
