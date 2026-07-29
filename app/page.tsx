@@ -13,7 +13,6 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <>
-      <div className="grid-bg pointer-events-none fixed inset-0 -z-10" />
       <Nav />
       <main>
         <Hero />

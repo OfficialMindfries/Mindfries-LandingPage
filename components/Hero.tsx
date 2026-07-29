@@ -1,179 +1,184 @@
 "use client";
 
-import { useRef } from "react";
 import { motion } from "framer-motion";
-import { AnimatedNumber } from "./primitives";
 import WaitlistForm from "./WaitlistForm";
 
 const partners = ["AlgoScale", "GoQii", "ScInter", "VXT AI"];
 
-const evidence = [
-  { label: "commits / 12mo", value: "2,481", weight: 0.94 },
-  { label: "PR reviews", value: "318", weight: 0.88 },
-  { label: "test coverage", value: "91%", weight: 0.83 },
-  { label: "issues resolved", value: "204", weight: 0.79 },
+// Node graph: a hub tile at center, satellites positioned by
+// percentage. Same coords drive the SVG connectors (viewBox is
+// 0..100 with non-uniform scaling so 1 unit == 1% on each axis).
+type Node = {
+  x: number;
+  y: number;
+  size: number;
+  tile: string;
+  glyph: React.ReactNode;
+  float: string;
+  hub?: boolean;
+};
+
+const HUB = { x: 50, y: 52 };
+
+const nodes: Node[] = [
+  { x: 50, y: 52, size: 76, tile: "tile-violet", glyph: <Check />, float: "float-b", hub: true },
+  { x: 17, y: 40, size: 54, tile: "tile-cyan", glyph: <Code />, float: "float-a" },
+  { x: 30, y: 82, size: 50, tile: "tile-yellow", glyph: "★", float: "float-c" },
+  { x: 71, y: 24, size: 54, tile: "tile-coral", glyph: <Bolt />, float: "float-a" },
+  { x: 84, y: 58, size: 50, tile: "tile-violet", glyph: "PN", float: "float-c" },
+  { x: 66, y: 84, size: 46, tile: "tile-coral", glyph: "DO", float: "float-b" },
 ];
 
-export default function Hero() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  function onMove(e: React.MouseEvent<HTMLDivElement>) {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
-    el.style.setProperty("--my", `${e.clientY - r.top}px`);
-  }
-
+function Check() {
   return (
-    <section
-      id="top"
-      ref={ref}
-      onMouseMove={onMove}
-      className="ambient relative overflow-hidden border-b border-hair"
-    >
-      {/* cursor spotlight */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0 opacity-70 transition-opacity"
-        style={{
-          background:
-            "radial-gradient(28rem 28rem at var(--mx,50%) var(--my,10%), rgba(27,58,107,0.07), transparent 70%)",
-        }}
-      />
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+function Code() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m16 18 6-6-6-6M8 6l-6 6 6 6" />
+    </svg>
+  );
+}
+function Bolt() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
+    </svg>
+  );
+}
 
-      <div className="relative z-10 mx-auto grid max-w-6xl gap-16 px-6 pb-24 pt-40 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-32 lg:pt-44">
-        {/* Left: copy */}
-        <div>
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-hair bg-surface/60 px-3 py-1.5"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            <span className="eyebrow !tracking-[0.18em]">AI hiring intelligence</span>
-          </motion.div>
+function NodeGraph() {
+  return (
+    <div className="relative mx-auto mb-10 h-64 w-full max-w-3xl sm:h-72">
+      {/* connectors */}
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        className="absolute inset-0 h-full w-full"
+      >
+        {nodes
+          .filter((n) => !n.hub)
+          .map((n, i) => (
+            <motion.line
+              key={i}
+              x1={HUB.x}
+              y1={HUB.y}
+              x2={n.x}
+              y2={n.y}
+              stroke="rgba(20,22,30,0.14)"
+              strokeWidth="0.35"
+              strokeDasharray="1.4 1.4"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ duration: 0.9, delay: 0.5 + i * 0.12, ease: "easeInOut" }}
+            />
+          ))}
+      </svg>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 0.8, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="text-balance text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl lg:text-[4.4rem]"
-          >
-            We rank engineers on what they{" "}
-            <span className="accent-text">actually built.</span>
-          </motion.h1>
+      {/* moving pulse dots along each connector */}
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+        {nodes
+          .filter((n) => !n.hub)
+          .map((n, i) => (
+            <motion.circle
+              key={i}
+              r="0.7"
+              fill="#7c3aed"
+              initial={{ cx: HUB.x, cy: HUB.y, opacity: 0 }}
+              animate={{ cx: [HUB.x, n.x], cy: [HUB.y, n.y], opacity: [0, 1, 0] }}
+              transition={{ duration: 2.4, delay: 1.4 + i * 0.3, repeat: Infinity, repeatDelay: 1.6, ease: "easeInOut" }}
+            />
+          ))}
+      </svg>
 
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 max-w-xl text-lg leading-relaxed text-dim"
-          >
-            Mindfries reads real work — GitHub, portfolios, live code — then runs an
-            adaptive assessment on a real codebase. You get a ranked shortlist with a
-            plain-English reason for every name.{" "}
-            <span className="text-ink">You decide.</span>
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-9"
-          >
-            <WaitlistForm compact />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3"
-          >
-            <span className="mono text-xs uppercase tracking-widest text-faint">
-              built with design partners
-            </span>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-              {partners.map((p) => (
-                <span key={p} className="text-sm text-dim">
-                  {p}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Right: evidence card visual */}
+      {/* tiles */}
+      {nodes.map((n, i) => (
         <motion.div
-          initial={{ opacity: 0, y: 30, rotateX: 6 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="relative"
-          style={{ perspective: 1200 }}
+          key={i}
+          className="absolute"
+          style={{ left: `${n.x}%`, top: `${n.y}%`, translateX: "-50%", translateY: "-50%" }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 + i * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
         >
-          <div className="hair-card relative overflow-hidden rounded-2xl p-6 shadow-2xl shadow-black/10">
-            <div className="flex items-center justify-between border-b border-hair pb-4">
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-full border border-hair-bright bg-surface-2 text-sm text-accent">
-                  ✓
-                </div>
-                <div>
-                  <div className="mono text-sm text-ink">@priya-nair</div>
-                  <div className="mono text-xs text-faint">backend · staff</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="mono text-[0.65rem] uppercase tracking-widest text-faint">
-                  match
-                </div>
-                <div className="mono text-2xl font-semibold text-accent">
-                  <AnimatedNumber value={94} />
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {evidence.map((e, i) => (
-                <motion.div
-                  key={e.label}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 + i * 0.12, duration: 0.5 }}
-                  className="flex items-center gap-3"
-                >
-                  <span className="mono w-32 shrink-0 text-xs text-dim">{e.label}</span>
-                  <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2">
-                    <motion.span
-                      className="absolute inset-y-0 left-0 rounded-full bg-accent"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${e.weight * 100}%` }}
-                      transition={{ delay: 0.8 + i * 0.12, duration: 0.9, ease: "easeOut" }}
-                    />
-                  </div>
-                  <span className="mono w-12 shrink-0 text-right text-xs text-ink">
-                    {e.value}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="mt-5 rounded-lg border border-hair bg-surface/50 p-3">
-              <div className="mono text-[0.65rem] uppercase tracking-widest text-faint">
-                why this rank
-              </div>
-              <p className="mt-1.5 text-sm leading-relaxed text-dim">
-                Two years of consistent commits to a production ML service, deep PR review
-                history, strong test discipline.{" "}
-                <span className="text-ink">Gap:</span> limited frontend exposure.
-              </p>
-            </div>
+          <div
+            className={`tile ${n.tile} ${n.float} text-sm font-bold`}
+            style={{ width: n.size, height: n.size }}
+          >
+            {n.glyph}
           </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
-          {/* floating accent chip */}
-          <div className="absolute -left-4 -top-4 hidden rounded-lg border border-hair-bright bg-surface px-3 py-2 shadow-xl shadow-black/10 sm:block">
-            <span className="mono text-xs text-dim">evidence read from</span>
-            <span className="mono ml-2 text-xs text-accent">github ↗</span>
+export default function Hero() {
+  return (
+    <section id="top" className="ambient relative overflow-hidden px-6 pb-20 pt-28 sm:pt-36">
+      <div className="mx-auto max-w-4xl text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-8 inline-flex items-center gap-2 rounded-full border border-hair bg-surface/70 px-4 py-1.5"
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+          <span className="eyebrow !tracking-[0.18em]">AI hiring intelligence</span>
+        </motion.div>
+
+        <NodeGraph />
+
+        <motion.h1
+          initial={{ opacity: 0, y: 20, filter: "blur(12px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto max-w-3xl text-balance text-5xl text-ink sm:text-6xl lg:text-7xl"
+        >
+          We rank engineers on what they{" "}
+          <span className="accent-text">actually built</span>.
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.35 }}
+          className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-dim"
+        >
+          Mindfries reads real work — GitHub, portfolios, live code — then runs an
+          adaptive assessment on a real codebase. You get a ranked shortlist with a
+          plain-English reason for every name.{" "}
+          <span className="font-medium text-ink">You decide.</span>
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="mx-auto mt-9 flex justify-center"
+        >
+          <WaitlistForm compact />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
+          className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
+        >
+          <span className="mono text-xs uppercase tracking-widest text-faint">
+            built with design partners
+          </span>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            {partners.map((p) => (
+              <span key={p} className="text-sm font-medium text-dim">
+                {p}
+              </span>
+            ))}
           </div>
         </motion.div>
       </div>

@@ -50,7 +50,7 @@ function Row({ c, p }: { c: Cand; p: MotionValue<number> }) {
   );
   const border = useMotionTemplate`1px solid rgba(23,20,15,${borderA})`;
   const bgA = useTransform(p, [0.82, 0.92], [0, c.rank === 0 ? 0.06 : 0]);
-  const bg = useMotionTemplate`rgba(27,58,107,${bgA})`;
+  const bg = useMotionTemplate`rgba(124,58,237,${bgA})`;
   const rankOpacity = useTransform(p, [0.8, 0.92], [0, 1]);
 
   return (

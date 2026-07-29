@@ -7,7 +7,6 @@ export default function CTA() {
   return (
     <section id="access" className="relative overflow-hidden border-t border-hair">
       <div className="ambient pointer-events-none absolute inset-0" />
-      <div className="grid-bg pointer-events-none absolute inset-0 opacity-40" />
       <div className="relative mx-auto max-w-3xl px-6 py-32 text-center">
         <Reveal>
           <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-hair bg-surface/60 px-3 py-1.5">

@@ -72,7 +72,7 @@ export default function WaitlistForm({ compact = false }: { compact?: boolean })
               <button
                 type="submit"
                 disabled={state === "loading"}
-                className="group flex h-12 items-center justify-center gap-2 rounded-xl bg-accent px-5 text-sm font-medium text-on-accent transition-opacity hover:opacity-90 disabled:opacity-60"
+                className="group flex h-12 items-center justify-center gap-2 rounded-full bg-accent-2 px-6 text-sm font-medium text-on-accent shadow-[0_10px_24px_-10px_rgba(244,80,47,0.7)] transition-all hover:-translate-y-0.5 disabled:opacity-60"
               >
                 {state === "loading" ? "Sending…" : "Request early access"}
                 {state !== "loading" && (
@@ -86,7 +86,7 @@ export default function WaitlistForm({ compact = false }: { compact?: boolean })
                 type="checkbox"
                 checked={partner}
                 onChange={(e) => setPartner(e.target.checked)}
-                className="h-4 w-4 accent-[#1b3a6b]"
+                className="h-4 w-4 accent-[#7c3aed]"
               />
               We&apos;re hiring engineers now — interested in being a design partner.
             </label>

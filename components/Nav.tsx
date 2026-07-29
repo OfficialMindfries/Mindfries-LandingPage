@@ -20,28 +20,30 @@ export default function Nav() {
   }, []);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
-        scrolled ? "border-b bg-bg/70 backdrop-blur-xl" : "border-b border-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <a href="#top" className="flex items-center gap-2.5">
+    <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
+      <div
+        className={`flex items-center gap-1 rounded-full border border-hair bg-surface/85 px-2 py-2 backdrop-blur-xl transition-shadow duration-500 ${
+          scrolled
+            ? "shadow-[0_12px_34px_-14px_rgba(20,22,30,0.28)]"
+            : "shadow-[0_6px_20px_-12px_rgba(20,22,30,0.2)]"
+        }`}
+      >
+        <a href="#top" className="flex items-center gap-2 px-3">
           <span className="relative flex h-2.5 w-2.5">
             <span className="pulse-dot absolute inline-flex h-full w-full rounded-full bg-accent" />
             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
           </span>
-          <span className="mono text-sm font-medium tracking-tight text-ink">
-            mindfries
+          <span className="text-sm font-semibold tracking-tight text-ink">
+            Mindfries
           </span>
         </a>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-1 md:flex">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-dim transition-colors hover:text-ink"
+              className="rounded-full px-3.5 py-2 text-sm text-dim transition-colors hover:bg-surface-2 hover:text-ink"
             >
               {l.label}
             </a>
@@ -50,12 +52,9 @@ export default function Nav() {
 
         <a
           href="#access"
-          className="group flex items-center gap-2 rounded-full border border-hair-bright bg-surface px-4 py-2 text-sm text-ink transition-colors hover:bg-surface-2"
+          className="ml-1 rounded-full bg-ink px-4 py-2 text-sm font-medium text-surface transition-transform hover:-translate-y-0.5"
         >
           Request access
-          <span className="text-accent transition-transform group-hover:translate-x-0.5">
-            →
-          </span>
         </a>
       </div>
     </header>
