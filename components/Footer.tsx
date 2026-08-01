@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const cols = [
   { title: "Product", links: ["How it works", "Evidence ranking", "Live assessment", "Shortlist"] },
@@ -15,7 +16,13 @@ export default function Footer() {
         <div className="grid gap-10 pb-16 sm:grid-cols-2 lg:grid-cols-4">
           <div className="max-w-xs">
             <div className="mb-3 flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-accent" />
+              <Image
+                src="/logo.png"
+                alt="Mindfries logo"
+                width={24}
+                height={24}
+                className="rounded-full overflow-hidden"
+              />
               <span className="font-semibold text-ink">Mindfries</span>
             </div>
             <p className="text-sm leading-relaxed text-dim">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const links = [
   { href: "#problem", label: "Problem" },
@@ -29,10 +30,14 @@ export default function Nav() {
         }`}
       >
         <a href="#top" className="flex items-center gap-2 px-3">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="pulse-dot absolute inline-flex h-full w-full rounded-full bg-accent" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
-          </span>
+          <Image
+            src="/logo.png"
+            alt="Mindfries logo"
+            width={26}
+            height={26}
+            className="rounded-full overflow-hidden"
+            priority
+          />
           <span className="text-sm font-semibold tracking-tight text-ink">
             Mindfries
           </span>
