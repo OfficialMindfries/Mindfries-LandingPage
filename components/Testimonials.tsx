@@ -12,14 +12,14 @@ const quotes = [
     text: "So many hiring tools become junk software — they add work instead of removing it. Mindfries actually reads the work and hands us a shortlist we trust.",
   },
   {
-    name: "Head of Engineering",
-    role: "AlgoScale",
+    name: "Neeraj Agrawal",
+    role: "Founder, AlgoScale",
     grad: "from-orange-300 to-rose-500",
     text: "We stopped losing strong engineers to keyword filters. Seeing real commits and a live-code assessment side by side changed who we interviewed.",
   },
   {
-    name: "Founder",
-    role: "VXT AI",
+    name: "Luke Campbell",
+    role: "Founder, VXT AI",
     grad: "from-sky-300 to-cyan-500",
     text: "The plain-English reason for every candidate is the part my team loves. It recommends, we decide — no black-box score to argue with.",
   },
