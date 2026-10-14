@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import Integrations from "@/components/Integrations";
+import Pipeline from "@/components/Pipeline";
 import Testimonials from "@/components/Testimonials";
-import Team from "@/components/Team";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
@@ -35,20 +35,24 @@ function GlidePanel({ children }: { children: React.ReactNode }) {
     offset: ["start end", "end start"], // start when bottom hits viewport bottom, end when top exits viewport top
   });
 
+  // Spring-smooth the raw scroll value so glides feel inertial rather than
+  // scrubbed 1:1 with the wheel.
+  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 26, mass: 0.4 });
+
   // ── Enter: slide up from 56px below, fade from 0
   // ── Exit:  drift up -20px, scale down to 0.96, fade to 0 (being "covered")
   const y = useTransform(
-    scrollYProgress,
+    smooth,
     [0, 0.33, 0.95, 1],
     [56, 0, 0, -20]
   );
   const opacity = useTransform(
-    scrollYProgress,
+    smooth,
     [0, 0.33, 0.95, 1],
     [0, 1, 1, 0]
   );
   const scale = useTransform(
-    scrollYProgress,
+    smooth,
     [0, 0.33, 0.95, 1],
     [0.98, 1, 1, 0.97]
   );
@@ -79,16 +83,16 @@ export default function Home() {
           <Features />
         </GlidePanel>
 
+        {/* Scroll-driven pipeline story — sticky inside, so it lives outside
+            GlidePanel (transforms/overflow-hidden would break position:sticky) */}
+        <Pipeline />
+
         <GlidePanel>
           <Integrations />
         </GlidePanel>
 
         <GlidePanel>
           <Testimonials />
-        </GlidePanel>
-
-        <GlidePanel>
-          <Team />
         </GlidePanel>
 
         <GlidePanel>

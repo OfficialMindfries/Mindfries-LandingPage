@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const cols = [
   { title: "Product", links: ["How it works", "Evidence ranking", "Live assessment", "Shortlist"] },
-  { title: "Company", links: ["Team", "Design partners", "Careers"] },
+  { title: "Company", links: ["Design partners", "Careers"] },
   { title: "Resources", links: ["Waitlist", "Contact"] },
 ];
 

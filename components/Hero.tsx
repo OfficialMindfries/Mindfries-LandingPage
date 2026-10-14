@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 /* ---- Node-graph hero (matches the video's opening/closing frame) ----
@@ -107,8 +108,24 @@ const nodes: Node[] = [
 const dotT = 0.58; // how far along each connector the pulsing dot sits
 
 function Graph() {
+  // Keep the 720×300 px geometry exact and scale the whole stage to the
+  // container width, so the graph stays true on every screen size.
+  const wrap = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const el = wrap.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() =>
+      setScale(Math.min(1, el.clientWidth / 720)),
+    );
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
-    <div className="relative mx-auto hidden h-[300px] w-[720px] max-w-full lg:block">
+    <div ref={wrap} className="mx-auto w-full max-w-[720px]" style={{ height: 300 * scale }}>
+      <div className="relative h-[300px] w-[720px] origin-top-left" style={{ transform: `scale(${scale})` }}>
       {/* connectors — 1:1 px geometry so the diagonals stay true */}
       <svg className="absolute inset-0 h-full w-full" viewBox="0 0 720 300" fill="none" aria-hidden>
         {nodes.map((n, i) => (
@@ -169,7 +186,42 @@ function Graph() {
           </svg>
         </div>
       </motion.div>
+      </div>
     </div>
+  );
+}
+
+/* Staggered word-by-word headline reveal */
+function Headline({ children, delay = 0.1 }: { children: React.ReactNode[]; delay?: number }) {
+  let w = 0;
+  return (
+    <h1 className="text-balance text-[clamp(2.5rem,5.5vw,3.75rem)] text-ink">
+      {children.map((chunk, c) =>
+        typeof chunk === "string"
+          ? chunk.split(" ").filter(Boolean).map((word) => (
+              <motion.span
+                key={`${c}-${word}-${w}`}
+                className="inline-block whitespace-pre"
+                initial={{ opacity: 0, y: 22, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.7, delay: delay + w++ * 0.07, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {word}{" "}
+              </motion.span>
+            ))
+          : (
+              <motion.span
+                key={`accent-${c}`}
+                className="inline-block"
+                initial={{ opacity: 0, y: 22, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.7, delay: delay + w++ * 0.07, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {chunk}
+              </motion.span>
+            ),
+      )}
+    </h1>
   );
 }
 
@@ -179,31 +231,12 @@ export default function Hero() {
       <div className="mx-auto max-w-5xl">
         <Graph />
 
-        {/* mobile: just the central tile */}
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-          className="mx-auto mb-7 lg:hidden"
-        >
-          <div className="tile tile-violet float-b mx-auto h-16 w-16 !rounded-3xl">
-            <svg width="30" height="30" viewBox="0 0 24 24" {...iconStroke} strokeWidth={2.25}>
-              <circle cx="12" cy="12" r="9" />
-              <path d="M8.5 12l2.5 2.5 4.5-5" />
-            </svg>
-          </div>
-        </motion.div>
-
-        <div className="mx-auto max-w-2xl text-center lg:-mt-2">
-          <motion.h1
-            initial={{ opacity: 0, y: 18, filter: "blur(12px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-balance text-5xl text-ink sm:text-6xl"
-          >
-            We rank engineers on what they{" "}
-            <span className="accent-text">actually built</span>.
-          </motion.h1>
+        <div className="mx-auto mt-7 max-w-2xl text-center lg:-mt-2">
+          <Headline>
+            {"We rank engineers on what they"}
+            <span className="accent-text">actually built</span>
+            {"."}
+          </Headline>
 
           <motion.p
             initial={{ opacity: 0, y: 14 }}

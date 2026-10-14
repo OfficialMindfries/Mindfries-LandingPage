@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 // ── SEO Metadata ────────────────────────────────────────────────────────────
-const SITE_URL = "https://mindfries.com";
+const SITE_URL = "https://mindfries.vercel.app";
 const SITE_NAME = "Mindfries";
 const TITLE = "Mindfries — Hiring Intelligence, Not Another ATS";
 const DESCRIPTION =
