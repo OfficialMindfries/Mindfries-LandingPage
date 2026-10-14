@@ -142,7 +142,8 @@ export default function Pipeline() {
 
   return (
     <section id="how" ref={ref} className="relative" style={{ height: "360vh" }}>
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+      {/* opaque bg so panels pinned behind in the deck don't show through */}
+      <div className="sticky top-0 z-10 flex h-screen items-center overflow-hidden bg-bg">
         <div className="mx-auto grid w-full max-w-6xl gap-12 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           {/* Left: narrative steps */}
           <div>

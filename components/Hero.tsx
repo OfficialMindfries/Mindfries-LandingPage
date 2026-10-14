@@ -253,17 +253,17 @@ export default function Hero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.45 }}
-            className="mt-8 flex items-center justify-center gap-3"
+            className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
           >
             <a
               href="#access"
-              className="rounded-full bg-accent-2 px-6 py-3 text-sm font-medium text-white shadow-[0_12px_28px_-10px_rgba(244,80,47,0.7)] transition-transform hover:-translate-y-0.5"
+              className="whitespace-nowrap rounded-full bg-accent-2 px-6 py-3 text-sm font-medium text-white shadow-[0_12px_28px_-10px_rgba(244,80,47,0.7)] transition-transform hover:-translate-y-0.5"
             >
               Request early access
             </a>
             <a
               href="#how"
-              className="rounded-full border border-hair-bright bg-surface px-5 py-3 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
+              className="whitespace-nowrap rounded-full border border-hair-bright bg-surface px-5 py-3 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
             >
               See how it works
             </a>

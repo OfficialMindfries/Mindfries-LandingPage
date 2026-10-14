@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
@@ -12,59 +12,59 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
 /**
- * GlidePanel — scroll-linked gliding effect.
+ * StackPanel — pedagon-style stacked-deck scrolling.
  *
- * Each section tracks its own scroll progress through the viewport:
- *   0  → section bottom just enters viewport from below
- *   1  → section top has left viewport above
+ * Every panel is position:sticky, so as you scroll each new panel slides up
+ * and COVERS the pinned one before it; earlier panels' top edges peek out
+ * behind by a few px per index (the deck effect).
  *
- * As it enters  (progress 0 → 0.12): slides up + fades in
- * While visible (progress 0.12 → 0.88): fully opaque, no transform
- * As it exits   (progress 0.88 → 1):  scales down slightly + fades out
- *                                       (simulates being "covered" by next panel)
+ * Pin offset: panels shorter than the viewport pin near the top; taller
+ * panels pin only once their bottom edge is on screen, so no content is
+ * ever trapped under the fold.
  *
- * Works on EVERY scroll — both down and up.
- * To revert: replace <GlidePanel> with <div className="panel overflow-hidden">
+ * On top of the stack, each panel keeps a spring-smoothed entrance glide
+ * (slide up + fade in) while it travels into view.
  */
-function GlidePanel({ children }: { children: React.ReactNode }) {
+function StackPanel({ children, index }: { children: React.ReactNode; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [top, setTop] = useState<number | null>(null);
 
-  // Track this element's scroll progress through the viewport window
+  const peek = 16 + index * 10; // where this card pins; later cards sit lower → earlier edges peek
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const compute = () =>
+      setTop(Math.min(peek, window.innerHeight - el.offsetHeight - 16));
+    const ro = new ResizeObserver(compute);
+    ro.observe(el);
+    window.addEventListener("resize", compute);
+    compute();
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", compute);
+    };
+  }, [peek]);
+
+  // Entrance glide while the panel travels up into view (before it pins)
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start end", "end start"], // start when bottom hits viewport bottom, end when top exits viewport top
+    offset: ["start end", "start 0.25"],
   });
-
-  // Spring-smooth the raw scroll value so glides feel inertial rather than
-  // scrubbed 1:1 with the wheel.
   const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 26, mass: 0.4 });
-
-  // ── Enter: slide up from 56px below, fade from 0
-  // ── Exit:  drift up -20px, scale down to 0.96, fade to 0 (being "covered")
-  const y = useTransform(
-    smooth,
-    [0, 0.33, 0.95, 1],
-    [56, 0, 0, -20]
-  );
-  const opacity = useTransform(
-    smooth,
-    [0, 0.33, 0.95, 1],
-    [0, 1, 1, 0]
-  );
-  const scale = useTransform(
-    smooth,
-    [0, 0.33, 0.95, 1],
-    [0.98, 1, 1, 0.97]
-  );
+  const y = useTransform(smooth, [0, 1], [48, 0]);
+  const opacity = useTransform(smooth, [0, 0.6], [0.4, 1]);
 
   return (
-    <motion.div
-      ref={ref}
-      style={{ y, opacity, scale }}
-      className="panel overflow-hidden will-change-transform"
-    >
-      {children}
-    </motion.div>
+    <div className="sticky" style={{ top: top ?? peek }}>
+      <motion.div
+        ref={ref}
+        style={index === 0 ? undefined : { y, opacity }}
+        className="panel overflow-hidden will-change-transform"
+      >
+        {children}
+      </motion.div>
+    </div>
   );
 }
 
@@ -73,35 +73,34 @@ export default function Home() {
     <>
       <Nav />
       <main className="space-y-4 px-3 py-3 sm:px-5 sm:py-5">
-        {/* Hero — static, always visible at the top */}
-        <div className="panel overflow-hidden">
+        {/* Deck: each panel pins and the next one slides up over it */}
+        <StackPanel index={0}>
           <Hero />
-        </div>
+        </StackPanel>
 
-        {/* Each section glides in on scroll, fades back as the next covers it */}
-        <GlidePanel>
+        <StackPanel index={1}>
           <Features />
-        </GlidePanel>
+        </StackPanel>
 
-        {/* Scroll-driven pipeline story — sticky inside, so it lives outside
-            GlidePanel (transforms/overflow-hidden would break position:sticky) */}
+        {/* Scroll-driven pipeline story — pins itself (own sticky viewport),
+            so it stays outside the StackPanel wrappers */}
         <Pipeline />
 
-        <GlidePanel>
+        <StackPanel index={2}>
           <Integrations />
-        </GlidePanel>
+        </StackPanel>
 
-        <GlidePanel>
+        <StackPanel index={3}>
           <Testimonials />
-        </GlidePanel>
+        </StackPanel>
 
-        <GlidePanel>
+        <StackPanel index={4}>
           <CTA />
-        </GlidePanel>
+        </StackPanel>
 
-        <GlidePanel>
+        <StackPanel index={5}>
           <Footer />
-        </GlidePanel>
+        </StackPanel>
       </main>
     </>
   );

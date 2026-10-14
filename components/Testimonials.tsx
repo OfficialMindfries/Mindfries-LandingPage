@@ -61,7 +61,7 @@ function GhostCard({ side, grad }: { side: "left" | "right"; grad: string }) {
       <motion.div
         animate={{ rotate: left ? -9 : 9, y: [0, left ? -10 : 10, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="h-60 w-52 rounded-[1.75rem] border border-hair bg-surface/70 p-6 opacity-70 blur-[1.5px] shadow-[0_20px_50px_-30px_rgba(20,22,30,0.5)]"
+        className="h-60 w-52 rounded-[1.75rem] border border-hair bg-surface/60 p-6 blur-[1.5px] shadow-[0_20px_50px_-30px_rgba(20,22,30,0.5)]"
       >
         <div className={`mx-auto mb-5 h-12 w-12 rounded-2xl bg-gradient-to-br ${grad} opacity-70`} />
         <div className="mx-auto h-3 w-24 rounded-full bg-hair-bright" />
