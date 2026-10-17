@@ -256,9 +256,9 @@ export default function HeroDashboard() {
   }, []);
 
   return (
-    <div ref={wrap} className="w-full" style={{ height: H * scale }}>
+    <div ref={wrap} className="relative w-full" style={{ height: H * scale }}>
       <motion.div
-        className="relative origin-top-left [perspective:2000px]"
+        className="absolute left-0 top-0 origin-top-left [perspective:2000px]"
         style={{ width: W, height: H, scale }}
         initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
