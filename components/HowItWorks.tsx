@@ -238,7 +238,8 @@ function Line({ n, children }: { n: number; children?: React.ReactNode }) {
 
 const K = ({ children }: { children: string }) => <span className="text-violet-600">{children}</span>;
 const S = ({ children }: { children: string }) => <span className="text-sky-600">{children}</span>;
-const R = ({ children }: { children: string }) => <span className="text-rose-500">{children}</span>;
+const R = ({ children }: { children: React.ReactNode }) => <span className="text-rose-500">{children}</span>;
+const D = ({ children }: { children: string }) => <span className="text-amber-600">{children}</span>;
 
 function AssessVisual() {
   return (
@@ -256,16 +257,16 @@ function AssessVisual() {
           </Svg>
           42:17
         </span>
-        <Line n={1}><K>class</K> LRUCache:</Line>
-        <Line n={2}>  <K>def</K> <S>__init__</S>(self, capacity: <K>int</K>):</Line>
-        <Line n={3}>    self.capacity = capacity</Line>
-        <Line n={4}>    self.cache = {"{}"}</Line>
-        <Line n={5}>    self.order = []</Line>
-        <Line n={6} />
-        <Line n={7}>  <K>def</K> <S>get</S>(self, key: <K>int</K>) -&gt; <K>int</K>:</Line>
-        <Line n={8}>    <K>if</K> key <K>not in</K> self.cache:</Line>
-        <Line n={9}>      <K>return</K> <R>-1</R></Line>
-        <Line n={10}>    <span className="text-faint"># ...</span></Line>
+        <Line n={1}><K>from</K> fastapi <K>import</K> FastAPI, HTTPException</Line>
+        <Line n={2} />
+        <Line n={3}>app = <S>FastAPI</S>()</Line>
+        <Line n={4} />
+        <Line n={5}><D>@app.get</D>(<R>&quot;/users/{"{user_id}"}&quot;</R>)</Line>
+        <Line n={6}><K>async def</K> <S>get_user</S>(user_id: <K>int</K>):</Line>
+        <Line n={7}>  user = <K>await</K> db.<S>fetch_user</S>(user_id)</Line>
+        <Line n={8}>  <K>if</K> user <K>is None</K>:</Line>
+        <Line n={9}>    <K>raise</K> <S>HTTPException</S>(<R>404</R>, <R>&quot;Not found&quot;</R>)</Line>
+        <Line n={10}>  <K>return</K> user</Line>
       </div>
       <div className="mt-3 flex items-center justify-center gap-5 pb-1">
         <span className="grid h-11 w-11 place-items-center rounded-full bg-white text-accent shadow-sm">
