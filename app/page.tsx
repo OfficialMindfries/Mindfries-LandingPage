@@ -6,6 +6,7 @@ import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import { PartnersIntro, PartnerVoices, JoinConversation } from "@/components/DesignPartners";
+import Pricing from "@/components/Pricing";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
@@ -141,6 +142,11 @@ export default function Home() {
         <Scene>
           <JoinConversation />
         </Scene>
+
+        {/* Pricing deals its plan cards out on scroll, so it skips the Scene transition */}
+        <div className="panel overflow-hidden">
+          <Pricing />
+        </div>
 
         {/* "Let's talk engineering." runs its own pinned reveal, so no Scene */}
         <CTA />

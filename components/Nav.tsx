@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 const links = [
   { href: "#how-it-works", label: "How it works" },
   { href: "#design-partners", label: "Design partners" },
+  { href: "#pricing", label: "Pricing" },
 ];
 
 export default function Nav() {
