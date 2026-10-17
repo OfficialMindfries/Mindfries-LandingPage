@@ -5,8 +5,8 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 
 const links = [
-  { href: "#difference", label: "What it does" },
-  { href: "#how", label: "How it works" },
+  { href: "#how-it-works", label: "How it works" },
+  { href: "#design-partners", label: "Design partners" },
 ];
 
 export default function Nav() {
