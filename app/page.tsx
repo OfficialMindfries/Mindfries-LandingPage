@@ -162,9 +162,8 @@ export default function Home() {
           <Testimonials />
         </Scene>
 
-        <Scene>
-          <CTA />
-        </Scene>
+        {/* "Let's talk engineering." runs its own pinned reveal, so no Scene */}
+        <CTA />
 
         <Scene>
           <Footer />
