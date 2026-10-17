@@ -33,21 +33,11 @@ const features = [
   { label: "Confident hiring decisions", icon: <path d="M6 20v-6M12 20V8M18 20V4" strokeWidth={3} /> },
 ];
 
-/* Wordmarks for the trust row — simple marks, not official brand assets */
-const logos: { name: string; mark?: React.ReactNode; cls?: string }[] = [
-  { name: "Vercel", mark: <path d="M12 4 22 20H2L12 4Z" fill="currentColor" stroke="none" /> },
-  { name: "Linear", mark: <><circle cx="12" cy="12" r="9" /><path d="m6 9 9 9M5 13l6 6M9 6l9 9" /></> },
-  { name: "Notion", mark: <><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M9 16V8l6 8V8" /></> },
-  { name: "GitHub", mark: <path d="M9 19c-4 1.5-4-2-6-2.5m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" /> },
-  { name: "stripe", cls: "font-bold tracking-tight text-[1.35rem]" },
-  { name: "supabase", mark: <path d="M13 2 4 14h8l-1 8 9-12h-8l1-8Z" fill="currentColor" stroke="none" /> },
-];
-
 export default function Hero() {
   return (
     <section
       id="top"
-      className="relative overflow-hidden px-6 pb-12 pt-28 sm:pt-32 lg:px-12 [background:radial-gradient(48rem_36rem_at_85%_10%,rgba(124,58,237,0.16),transparent_60%),radial-gradient(40rem_30rem_at_100%_80%,rgba(124,58,237,0.12),transparent_60%),radial-gradient(30rem_24rem_at_0%_0%,rgba(124,58,237,0.05),transparent_60%)]"
+      className="relative overflow-hidden px-6 pb-16 pt-28 sm:pt-32 lg:px-12 [background:radial-gradient(48rem_36rem_at_85%_10%,rgba(124,58,237,0.16),transparent_60%),radial-gradient(40rem_30rem_at_100%_80%,rgba(124,58,237,0.12),transparent_60%),radial-gradient(30rem_24rem_at_0%_0%,rgba(124,58,237,0.05),transparent_60%)]"
     >
       <div className="mx-auto grid max-w-[90rem] items-center gap-12 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] xl:gap-8">
         {/* copy */}
@@ -124,26 +114,6 @@ export default function Hero() {
           <HeroDashboard />
         </div>
       </div>
-
-      {/* trust row */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.9 }}
-        className="mx-auto mt-14 max-w-6xl text-center"
-      >
-        <p className="text-[0.75rem] font-medium uppercase tracking-[0.24em] text-slate-500">Trusted by forward-thinking engineering teams</p>
-        <ul className="mt-6 flex flex-wrap items-center justify-center gap-y-4 sm:divide-x sm:divide-hair-bright">
-          {logos.map((l) => (
-            <li key={l.name} className="flex items-center gap-2 px-6 text-xl font-semibold text-slate-500 sm:px-9">
-              {l.mark && (
-                <svg width="24" height="24" viewBox="0 0 24 24" {...stroke} aria-hidden>{l.mark}</svg>
-              )}
-              <span className={l.cls}>{l.name}</span>
-            </li>
-          ))}
-        </ul>
-      </motion.div>
     </section>
   );
 }
