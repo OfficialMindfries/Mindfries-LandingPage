@@ -81,7 +81,7 @@ export default function Hero() {
               </svg>
             </a>
             <a
-              href="#how-it-works"
+              href="#demo"
               className="inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-xl border border-hair-bright bg-white px-7 py-4 text-base font-medium text-ink transition-colors hover:bg-surface-2"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" {...stroke} strokeWidth={1.8} aria-hidden>
