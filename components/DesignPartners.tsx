@@ -83,6 +83,38 @@ const initials = (s: string) =>
     .slice(0, 2)
     .toUpperCase();
 
+/* Official logo marks, downloaded from each company's own site */
+const logos: Record<string, string> = {
+  GOQii: "/partners/goqii.png",
+  "VXT AI": "/partners/vxt.png",
+  KubeGraf: "/partners/kubegraf.png",
+  AlgoScale: "/partners/algoscale.webp",
+};
+
+/* A company's logo in a soft white tile; initials when we don't have one */
+function CompanyLogo({ company, size = 32, className = "" }: { company: string; size?: number; className?: string }) {
+  const src = logos[company];
+  const box = { width: size, height: size };
+  if (!src) {
+    return (
+      <span
+        style={box}
+        className={`grid shrink-0 place-items-center rounded-lg bg-[#1e1b4b] text-[11px] font-semibold text-white shadow-sm ${className}`}
+      >
+        {initials(company)}
+      </span>
+    );
+  }
+  return (
+    <span
+      style={box}
+      className={`grid shrink-0 place-items-center overflow-hidden rounded-lg border border-hair bg-white shadow-sm ${className}`}
+    >
+      <Image src={src} alt={`${company} logo`} width={size} height={size} className="h-full w-full object-contain" />
+    </span>
+  );
+}
+
 function Avatar({ name, grad, className = "h-16 w-16 text-lg" }: { name: string; grad: string; className?: string }) {
   return (
     <span
@@ -202,8 +234,10 @@ export function PartnersIntro() {
                 <Svg size={20}>{s.icon}</Svg>
               </span>
               <p className="relative mt-6 font-serif text-[22px] font-semibold text-[#1e1b4b]">{s.title}</p>
-              <p className="relative mt-0.5 text-[13px] text-dim">
-                Design partner · <span className="font-medium text-ink/80">{s.company}</span>
+              <p className="relative mt-1 flex items-center gap-1.5 text-[13px] text-dim">
+                Design partner ·
+                <CompanyLogo company={s.company} size={18} className="!rounded-[5px]" />
+                <span className="font-medium text-ink/80">{s.company}</span>
               </p>
             </div>
           </FadeUp>
@@ -214,14 +248,6 @@ export function PartnersIntro() {
 }
 
 /* ---------- Panel 2: what they told us ---------- */
-
-function CompanyBadge({ company }: { company: string }) {
-  return (
-    <span className="grid h-8 min-w-8 place-items-center rounded-lg bg-[#1e1b4b] px-1.5 text-[11px] font-semibold text-white shadow-sm">
-      {initials(company)}
-    </span>
-  );
-}
 
 function ArrowButton({ dir, onClick }: { dir: "prev" | "next"; onClick: () => void }) {
   return (
@@ -285,7 +311,7 @@ export function PartnerVoices() {
             >
               <div className="flex items-end justify-between">
                 <Avatar name={p.name} grad={p.grad} />
-                <CompanyBadge company={p.company} />
+                <CompanyLogo company={p.company} size={36} />
               </div>
               <p className="mt-5 font-serif text-[19px] font-semibold leading-tight text-[#1e1b4b]">{p.name}</p>
               <p className="mt-1 text-[13px] text-dim">
@@ -346,6 +372,7 @@ export function JoinConversation() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: i * 0.07, ease }}
           >
+            <CompanyLogo company={p.company} size={40} className="mb-2.5 !rounded-xl" />
             <span className="font-serif text-[22px] font-semibold tracking-tight text-[#1e1b4b]">{p.company}</span>
             <span className="mt-1 text-[12px] text-dim">
               {p.name} · {p.role}
