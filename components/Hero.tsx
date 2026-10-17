@@ -37,7 +37,7 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative overflow-hidden px-6 pb-16 pt-28 sm:pt-32 lg:px-12 [background:radial-gradient(48rem_36rem_at_85%_10%,rgba(124,58,237,0.16),transparent_60%),radial-gradient(40rem_30rem_at_100%_80%,rgba(124,58,237,0.12),transparent_60%),radial-gradient(30rem_24rem_at_0%_0%,rgba(124,58,237,0.05),transparent_60%)]"
+      className="relative overflow-hidden px-6 pb-10 pt-24 sm:pt-28 lg:px-12 [background:radial-gradient(48rem_36rem_at_85%_10%,rgba(124,58,237,0.16),transparent_60%),radial-gradient(40rem_30rem_at_100%_80%,rgba(124,58,237,0.12),transparent_60%),radial-gradient(30rem_24rem_at_0%_0%,rgba(124,58,237,0.05),transparent_60%)]"
     >
       <div className="mx-auto grid max-w-[90rem] items-center gap-12 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] xl:gap-8">
         {/* copy */}
