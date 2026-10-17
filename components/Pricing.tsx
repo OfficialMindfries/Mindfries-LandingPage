@@ -190,11 +190,10 @@ function Price({ plan, annual }: { plan: Plan; annual: boolean }) {
             </motion.span>
           </AnimatePresence>
         </span>
-        <span className="pb-1 text-[13px] text-dim">/ month</span>
+        <span className="pb-1 text-[13px] text-dim">
+          / month · {annual ? `billed annually (${usd(perMonth * 12)}/yr)` : "billed monthly"}
+        </span>
       </div>
-      <p className="mt-1.5 h-4 text-[12px] text-dim">
-        {annual ? `Billed annually · ${usd(perMonth * 12)} / year` : "Billed monthly"}
-      </p>
     </div>
   );
 }
@@ -228,15 +227,11 @@ function PlanCard({
   return (
     <motion.div
       style={deal ? { x, y, rotate, scale, zIndex: d.z } : undefined}
-      className={`relative flex flex-col rounded-[2rem] p-8 xl:p-9 ${
+      className={`relative flex flex-col rounded-[2rem] px-8 py-6 ${
         featured
-          ? "border-2 border-violet-400/80 bg-white shadow-[0_40px_80px_-30px_rgba(124,58,237,0.55),0_0_0_6px_rgba(167,139,250,0.12)] lg:-my-3 lg:py-10"
+          ? "border-2 border-violet-400/80 bg-white shadow-[0_40px_80px_-30px_rgba(124,58,237,0.55),0_0_0_6px_rgba(167,139,250,0.12)] lg:-my-2 lg:py-8"
           : "border border-white/80 bg-white/75 shadow-[0_30px_60px_-36px_rgba(76,29,149,0.4)] backdrop-blur-xl"
       }`}
-      initial={deal ? false : { opacity: 0, y: 30 }}
-      whileInView={deal ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.7, delay: 0.1 + index * 0.1, ease }}
     >
       {featured && (
         <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-violet-500 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_8px_20px_-6px_rgba(124,58,237,0.7)]">
@@ -245,8 +240,8 @@ function PlanCard({
       )}
 
       <div className="flex items-center gap-4">
-        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-violet-100 text-accent">
-          <Svg size={24}>{plan.icon}</Svg>
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-violet-100 text-accent">
+          <Svg size={22}>{plan.icon}</Svg>
         </span>
         <div>
           <p className="font-serif text-[24px] font-semibold leading-tight text-[#1e1b4b]">{plan.name}</p>
@@ -254,13 +249,13 @@ function PlanCard({
         </div>
       </div>
 
-      <span className="my-6 block h-px bg-hair" />
+      <span className="my-4 block h-px bg-hair" />
 
       <Price plan={plan} annual={annual} />
 
-      <ul className="mt-7 flex-1 space-y-3.5">
+      <ul className="mt-4 flex-1 space-y-2">
         {plan.features.map((f) => (
-          <li key={f} className="flex items-start gap-3 text-[15px] text-ink/80">
+          <li key={f} className="flex items-start gap-3 text-[14.5px] text-ink/80">
             <Svg size={16} className="mt-0.5 shrink-0 text-violet-500">
               <path d="m5 12 4.5 4.5L19 7" strokeWidth={2.4} />
             </Svg>
@@ -271,7 +266,7 @@ function PlanCard({
 
       <a
         href="#access"
-        className={`group mt-9 inline-flex items-center justify-center gap-2 rounded-full px-6 py-4 text-[16px] font-medium transition-transform hover:-translate-y-0.5 ${
+        className={`group mt-6 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-medium transition-transform hover:-translate-y-0.5 ${
           featured
             ? "bg-[#0f172a] text-white shadow-[0_16px_34px_-14px_rgba(76,29,149,0.7)]"
             : "border border-hair-bright bg-white text-ink hover:bg-surface-2"
@@ -288,7 +283,7 @@ function PlanCard({
 
 function BillingToggle({ annual, onChange }: { annual: boolean; onChange: (annual: boolean) => void }) {
   return (
-    <div className="relative mt-9 flex items-center justify-center">
+    <div className="relative mt-5 flex items-center justify-center">
       <div role="radiogroup" aria-label="Billing period" className="relative flex rounded-full border border-hair bg-surface-2/80 p-1.5">
         {[false, true].map((isAnnual) => {
           const active = annual === isAnnual;
@@ -299,7 +294,7 @@ function BillingToggle({ annual, onChange }: { annual: boolean; onChange: (annua
               role="radio"
               aria-checked={active}
               onClick={() => onChange(isAnnual)}
-              className={`relative z-10 rounded-full px-7 py-2.5 text-[14px] font-medium transition-colors ${
+              className={`relative z-10 rounded-full px-7 py-2 text-[14px] font-medium transition-colors ${
                 active ? "text-ink" : "text-dim hover:text-ink"
               }`}
             >
@@ -347,7 +342,7 @@ export default function Pricing() {
     <section
       ref={ref}
       id="pricing"
-      className="relative overflow-hidden px-6 py-16 sm:py-20 lg:px-12 [background:radial-gradient(52rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(30rem_30rem_at_0%_60%,rgba(124,58,237,0.08),transparent_60%),radial-gradient(30rem_30rem_at_100%_60%,rgba(124,58,237,0.08),transparent_60%)]"
+      className="relative overflow-hidden px-6 py-10 sm:py-12 lg:px-12 [background:radial-gradient(52rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(30rem_30rem_at_0%_60%,rgba(124,58,237,0.08),transparent_60%),radial-gradient(30rem_30rem_at_100%_60%,rgba(124,58,237,0.08),transparent_60%)]"
     >
       <div className="mx-auto max-w-[78rem]">
       <motion.div
@@ -357,35 +352,34 @@ export default function Pricing() {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.75, ease }}
       >
-        <span className="inline-flex items-center gap-2.5 rounded-full border border-hair bg-white/70 px-4 py-2 backdrop-blur">
+        <span className="inline-flex items-center gap-2.5 rounded-full border border-hair bg-white/70 px-4 py-1.5 backdrop-blur">
           <span className="h-1.5 w-1.5 rounded-full bg-accent" />
           <span className="text-[0.72rem] font-medium uppercase tracking-[0.28em] text-ink/70">Pricing</span>
         </span>
-        <h2 className="mx-auto mt-6 max-w-4xl text-[clamp(2.4rem,5vw,4.5rem)] !font-serif !font-semibold !leading-[1.04] !tracking-[-0.02em] text-[#1e1b4b]">
-          Invest in better
-          <br />
+        <h2 className="mx-auto mt-4 max-w-5xl text-[clamp(2.2rem,4vw,3.6rem)] !font-serif !font-semibold !leading-[1.04] !tracking-[-0.02em] text-[#1e1b4b]">
+          Invest in better <br className="lg:hidden" />
           <em className="bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text pr-2 italic text-transparent">
             hiring decisions.
           </em>
         </h2>
-        <p className="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-dim sm:text-[17px]">
+        <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-dim sm:text-[16px]">
           Simple, transparent plans to help you hire engineers with confidence.
         </p>
       </motion.div>
 
       <BillingToggle annual={annual} onChange={setAnnual} />
 
-      <div className="mt-14 grid items-stretch gap-6 lg:grid-cols-3 xl:gap-8">
+      <div className="mt-7 grid items-stretch gap-6 lg:grid-cols-3 xl:gap-8">
         {plans.map((plan, i) => (
           <PlanCard key={plan.name} plan={plan} annual={annual} index={i} deal={dealing ? deal : null} />
         ))}
       </div>
 
-      <ul className="mt-12 grid gap-6 border-t border-hair pt-8 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-hair">
+      <ul className="mt-6 grid gap-6 border-t border-hair pt-4 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-hair">
         {assurances.map((a) => (
           <li key={a.title} className="flex items-center gap-4 lg:px-6 lg:first:pl-0">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-violet-100 text-accent">
-              <Svg size={20}>{a.icon}</Svg>
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-violet-100 text-accent">
+              <Svg size={18}>{a.icon}</Svg>
             </span>
             <div>
               <p className="text-[14px] font-medium text-ink">{a.title}</p>
