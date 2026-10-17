@@ -421,13 +421,15 @@ export function JoinConversation() {
                 key={p.name}
                 className={`absolute -translate-x-1/2 -translate-y-1/2 ${["float-a", "float-b", "float-c"][i % 3]}`}
                 style={{ left: `${orbit[i].x}%`, top: `${orbit[i].y}%` }}
-                title={`${p.name}, ${p.company}`}
+                title={p.company}
                 initial={{ opacity: 0, scale: 0.6 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
               >
-                <Avatar name={p.name} grad={p.grad} className="h-14 w-14 text-[15px]" />
+                <span className="grid h-16 w-16 place-items-center rounded-full bg-white shadow-[0_12px_28px_-10px_rgba(76,29,149,0.45)] ring-4 ring-white">
+                  <CompanyLogo company={p.company} size={40} className="!rounded-xl !border-0 !shadow-none" />
+                </span>
               </motion.span>
             ))}
           </div>
