@@ -8,7 +8,6 @@ import HowItWorks from "@/components/HowItWorks";
 import DemoVideo from "@/components/DemoVideo";
 import { PartnersIntro, PartnerVoices, JoinConversation } from "@/components/DesignPartners";
 import Pricing from "@/components/Pricing";
-import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
@@ -153,10 +152,6 @@ export default function Home() {
         <div className="panel overflow-hidden">
           <Pricing />
         </div>
-
-        <Scene>
-          <FAQ />
-        </Scene>
 
         {/* "Let's talk engineering." runs its own pinned reveal, so no Scene */}
         <CTA />
