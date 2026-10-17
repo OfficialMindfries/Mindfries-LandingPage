@@ -385,13 +385,61 @@ function Arrow() {
   );
 }
 
+/* From xl up (four steps side by side) the section takes exactly the hero's
+   height; if the content is taller it scales down to fit. Below xl the steps
+   stack and the section keeps its natural height. */
+const LOCK_QUERY = "(min-width: 1280px)";
+const PAD_Y = 48; // xl:py-12, per side
+
+function useHeroLock() {
+  const content = useRef<HTMLDivElement>(null);
+  const [lock, setLock] = useState<{ height: number; scale: number; natural: number } | null>(null);
+
+  useEffect(() => {
+    const hero = document.getElementById("top");
+    const el = content.current;
+    if (!hero || !el) return;
+    const mq = window.matchMedia(LOCK_QUERY);
+    const update = () => {
+      if (!mq.matches) return setLock(null);
+      const height = hero.offsetHeight;
+      const natural = el.offsetHeight; // layout height, unaffected by transform
+      setLock({ height, natural, scale: Math.min(1, (height - PAD_Y * 2) / natural) });
+    };
+    const ro = new ResizeObserver(update);
+    ro.observe(hero);
+    ro.observe(el);
+    mq.addEventListener("change", update);
+    window.addEventListener("resize", update);
+    update();
+    return () => {
+      ro.disconnect();
+      mq.removeEventListener("change", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  return { content, lock };
+}
+
 export default function HowItWorks() {
+  const { content, lock } = useHeroLock();
+
   return (
     <section
       id="how-it-works"
-      className="relative overflow-hidden px-6 py-16 sm:py-20 lg:px-12 [background:radial-gradient(50rem_30rem_at_50%_0%,rgba(124,58,237,0.08),transparent_65%),radial-gradient(40rem_30rem_at_0%_100%,rgba(124,58,237,0.06),transparent_60%)]"
+      className="relative flex flex-col justify-center overflow-hidden px-6 py-16 sm:py-20 lg:px-12 xl:py-12 [background:radial-gradient(50rem_30rem_at_50%_0%,rgba(124,58,237,0.08),transparent_65%),radial-gradient(40rem_30rem_at_0%_100%,rgba(124,58,237,0.06),transparent_60%)]"
+      style={lock ? { height: lock.height } : undefined}
     >
-      <div className="mx-auto max-w-[88rem]">
+      <div
+        ref={content}
+        className="mx-auto w-full max-w-[88rem] origin-top"
+        style={
+          lock && lock.scale < 1
+            ? { transform: `scale(${lock.scale})`, marginBottom: -lock.natural * (1 - lock.scale) }
+            : undefined
+        }
+      >
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
