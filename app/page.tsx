@@ -5,7 +5,6 @@ import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "fr
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
-import DemoVideo from "@/components/DemoVideo";
 import { PartnersIntro, PartnerVoices, JoinConversation } from "@/components/DesignPartners";
 import Pricing from "@/components/Pricing";
 import CTA from "@/components/CTA";
@@ -131,10 +130,6 @@ export default function Home() {
         </div>
 
         {/* From here on, each panel eases into view and recedes as it scrolls away */}
-
-        <Scene>
-          <DemoVideo />
-        </Scene>
 
         <Scene>
           <PartnersIntro />
