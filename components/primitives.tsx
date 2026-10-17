@@ -106,4 +106,69 @@ export function SectionLabel({ index, children }: { index: string; children: str
   );
 }
 
+/* Stack panels that should match the hero: from xl up the section takes
+   exactly the hero's height (#top) and scales its content down to fit if
+   needed. Below xl it keeps its natural height. */
+const LOCK_QUERY = "(min-width: 1280px)";
+const LOCK_PAD_Y = 48; // xl:py-12, per side
+
+export function HeroHeightSection({
+  id,
+  className = "",
+  contentClassName = "",
+  children,
+}: {
+  id?: string;
+  className?: string;
+  contentClassName?: string;
+  children: React.ReactNode;
+}) {
+  const content = useRef<HTMLDivElement>(null);
+  const [lock, setLock] = useState<{ height: number; scale: number; natural: number } | null>(null);
+
+  useEffect(() => {
+    const hero = document.getElementById("top");
+    const el = content.current;
+    if (!hero || !el) return;
+    const mq = window.matchMedia(LOCK_QUERY);
+    const update = () => {
+      if (!mq.matches) return setLock(null);
+      const height = hero.offsetHeight;
+      const natural = el.offsetHeight; // layout height, unaffected by transform
+      setLock({ height, natural, scale: Math.min(1, (height - LOCK_PAD_Y * 2) / natural) });
+    };
+    const ro = new ResizeObserver(update);
+    ro.observe(hero);
+    ro.observe(el);
+    mq.addEventListener("change", update);
+    window.addEventListener("resize", update);
+    update();
+    return () => {
+      ro.disconnect();
+      mq.removeEventListener("change", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  return (
+    <section
+      id={id}
+      className={`relative flex flex-col justify-center overflow-hidden ${className}`}
+      style={lock ? { height: lock.height } : undefined}
+    >
+      <div
+        ref={content}
+        className={`w-full origin-top ${contentClassName}`}
+        style={
+          lock && lock.scale < 1
+            ? { transform: `scale(${lock.scale})`, marginBottom: -lock.natural * (1 - lock.scale) }
+            : undefined
+        }
+      >
+        {children}
+      </div>
+    </section>
+  );
+}
+
 export { motion, useTransform };

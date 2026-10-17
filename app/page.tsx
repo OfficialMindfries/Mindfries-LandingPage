@@ -5,6 +5,7 @@ import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
+import { PartnersIntro, PartnerVoices, JoinConversation } from "@/components/DesignPartners";
 import Features from "@/components/Features";
 import Integrations from "@/components/Integrations";
 import Pipeline from "@/components/Pipeline";
@@ -84,6 +85,18 @@ export default function Home() {
         </StackPanel>
 
         <StackPanel index={2}>
+          <PartnersIntro />
+        </StackPanel>
+
+        <StackPanel index={3}>
+          <PartnerVoices />
+        </StackPanel>
+
+        <StackPanel index={4}>
+          <JoinConversation />
+        </StackPanel>
+
+        <StackPanel index={5}>
           <Features />
         </StackPanel>
 
@@ -91,19 +104,19 @@ export default function Home() {
             so it stays outside the StackPanel wrappers */}
         <Pipeline />
 
-        <StackPanel index={3}>
+        <StackPanel index={6}>
           <Integrations />
         </StackPanel>
 
-        <StackPanel index={4}>
+        <StackPanel index={7}>
           <Testimonials />
         </StackPanel>
 
-        <StackPanel index={5}>
+        <StackPanel index={8}>
           <CTA />
         </StackPanel>
 
-        <StackPanel index={6}>
+        <StackPanel index={9}>
           <Footer />
         </StackPanel>
       </main>
