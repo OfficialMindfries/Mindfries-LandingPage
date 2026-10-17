@@ -41,20 +41,13 @@ const cols: { title: string; links: { label: string; href?: string }[] }[] = [
 const socials = [
   {
     label: "LinkedIn",
-    href: "",
+    href: "https://www.linkedin.com/company/mindfries/",
     icon: <path d="M7 10v7M7 7v.01M11 17v-7m0 3.5c0-2 1.2-3.5 3-3.5s3 1.2 3 3.5V17" strokeWidth={2.1} />,
   },
   {
     label: "X",
     href: "https://x.com/mindfries",
     icon: <path d="m5 5 14 14M19 5 5 19" strokeWidth={2} />,
-  },
-  {
-    label: "GitHub",
-    href: "https://github.com/OfficialMindfries",
-    icon: (
-      <path d="M9 19c-4 1.5-4-2-6-2.5m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
-    ),
   },
 ];
 
