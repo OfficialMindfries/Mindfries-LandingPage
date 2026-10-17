@@ -6,10 +6,6 @@ import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import { PartnersIntro, PartnerVoices, JoinConversation } from "@/components/DesignPartners";
-import Features from "@/components/Features";
-import Integrations from "@/components/Integrations";
-import Pipeline from "@/components/Pipeline";
-import Testimonials from "@/components/Testimonials";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
@@ -144,22 +140,6 @@ export default function Home() {
 
         <Scene>
           <JoinConversation />
-        </Scene>
-
-        <Scene>
-          <Features />
-        </Scene>
-
-        {/* Scroll-driven pipeline story — pins itself (own sticky viewport),
-            so it stays outside the Scene wrappers */}
-        <Pipeline />
-
-        <Scene>
-          <Integrations />
-        </Scene>
-
-        <Scene>
-          <Testimonials />
         </Scene>
 
         {/* "Let's talk engineering." runs its own pinned reveal, so no Scene */}
