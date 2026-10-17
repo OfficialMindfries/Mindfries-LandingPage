@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import HowItWorks from "@/components/HowItWorks";
 import Features from "@/components/Features";
 import Integrations from "@/components/Integrations";
 import Pipeline from "@/components/Pipeline";
@@ -79,6 +80,10 @@ export default function Home() {
         </StackPanel>
 
         <StackPanel index={1}>
+          <HowItWorks />
+        </StackPanel>
+
+        <StackPanel index={2}>
           <Features />
         </StackPanel>
 
@@ -86,19 +91,19 @@ export default function Home() {
             so it stays outside the StackPanel wrappers */}
         <Pipeline />
 
-        <StackPanel index={2}>
+        <StackPanel index={3}>
           <Integrations />
         </StackPanel>
 
-        <StackPanel index={3}>
+        <StackPanel index={4}>
           <Testimonials />
         </StackPanel>
 
-        <StackPanel index={4}>
+        <StackPanel index={5}>
           <CTA />
         </StackPanel>
 
-        <StackPanel index={5}>
+        <StackPanel index={6}>
           <Footer />
         </StackPanel>
       </main>
