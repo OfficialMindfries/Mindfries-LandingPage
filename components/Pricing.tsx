@@ -233,10 +233,6 @@ function PlanCard({
           ? "border-2 border-violet-400/80 bg-white shadow-[0_40px_80px_-30px_rgba(124,58,237,0.55),0_0_0_6px_rgba(167,139,250,0.12)] lg:-my-3 lg:py-10"
           : "border border-white/80 bg-white/75 shadow-[0_30px_60px_-36px_rgba(76,29,149,0.4)] backdrop-blur-xl"
       }`}
-      initial={deal ? false : { opacity: 0, y: 30 }}
-      whileInView={deal ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.7, delay: 0.1 + index * 0.1, ease }}
     >
       {featured && (
         <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-violet-500 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_8px_20px_-6px_rgba(124,58,237,0.7)]">
