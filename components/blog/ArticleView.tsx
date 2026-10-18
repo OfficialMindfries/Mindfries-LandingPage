@@ -188,10 +188,12 @@ export default function ArticleView({ post, related }: { post: Post; related: Po
         </article>
 
         {/* right: author, related, newsletter */}
-        <aside className="space-y-10 lg:col-span-2 xl:col-span-1">
-          {post.author && <AuthorCard author={post.author} />}
-          <Related posts={related} />
-          <Newsletter />
+        <aside className="lg:col-span-2 xl:col-span-1">
+          <div className="space-y-10 xl:sticky xl:top-28">
+            {post.author && <AuthorCard author={post.author} />}
+            <Related posts={related} />
+            <Newsletter />
+          </div>
         </aside>
       </div>
     </BlogShell>
