@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 
+// Absolute paths so the nav also works from /blog pages
 const links = [
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#design-partners", label: "Design partners" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#design-partners", label: "Design partners" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/blog", label: "Blog" },
 ];
 
 export default function Nav() {
@@ -30,7 +33,7 @@ export default function Nav() {
             : "shadow-[0_6px_20px_-12px_rgba(20,22,30,0.2)]"
         }`}
       >
-        <a href="#top" className="flex items-center gap-2 px-3">
+        <Link href="/" className="flex items-center gap-2 px-3">
           <Image
             src="/logo.png"
             alt="Mindfries logo"
@@ -42,26 +45,26 @@ export default function Nav() {
           <span className="text-sm font-semibold tracking-tight text-ink">
             Mindfries
           </span>
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
           {links.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               className="rounded-full px-3.5 py-2 text-sm text-dim transition-colors hover:bg-surface-2 hover:text-ink"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
-        <a
-          href="#access"
+        <Link
+          href="/#access"
           className="ml-1 rounded-full bg-ink px-4 py-2 text-sm font-medium text-surface transition-transform hover:-translate-y-0.5"
         >
           Request access
-        </a>
+        </Link>
 
         {/* mobile menu toggle */}
         <button
@@ -73,10 +76,12 @@ export default function Nav() {
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
             <motion.path
+              initial={{ d: "M2.5 5.5 L15.5 5.5" }}
               animate={open ? { d: "M4 4 L14 14" } : { d: "M2.5 5.5 L15.5 5.5" }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             />
             <motion.path
+              initial={{ d: "M2.5 12.5 L15.5 12.5" }}
               animate={open ? { d: "M14 4 L4 14" } : { d: "M2.5 12.5 L15.5 12.5" }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             />
@@ -95,17 +100,20 @@ export default function Nav() {
             className="mt-2 w-full max-w-xs overflow-hidden rounded-3xl border border-hair bg-surface/95 p-2 shadow-[0_24px_60px_-20px_rgba(20,22,30,0.3)] backdrop-blur-xl md:hidden"
           >
             {links.map((l, i) => (
-              <motion.a
+              <motion.div
                 key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.05 + i * 0.05, duration: 0.3 }}
-                className="block rounded-2xl px-4 py-3 text-sm text-dim transition-colors hover:bg-surface-2 hover:text-ink"
               >
-                {l.label}
-              </motion.a>
+                <Link
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className="block rounded-2xl px-4 py-3 text-sm text-dim transition-colors hover:bg-surface-2 hover:text-ink"
+                >
+                  {l.label}
+                </Link>
+              </motion.div>
             ))}
           </motion.nav>
         )}
