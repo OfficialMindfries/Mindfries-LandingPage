@@ -61,17 +61,17 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* giant blur-in wordmark */}
+      {/* giant blur-in wordmark, sized to the footer's own width (cqw) so the whole word always fits */}
       <motion.div
         initial={{ opacity: 0, filter: "blur(24px)" }}
         whileInView={{ opacity: 1, filter: "blur(6px)" }}
         viewport={{ once: true }}
         transition={{ duration: 1 }}
-        className="pointer-events-none select-none pt-8 text-center"
+        className="@container pointer-events-none select-none pt-8 text-center"
         aria-hidden
       >
         <span
-          className="block bg-gradient-to-b from-accent to-accent-2 bg-clip-text text-[22vw] font-extrabold leading-none tracking-tighter text-transparent"
+          className="block bg-gradient-to-b from-accent to-accent-2 bg-clip-text text-[22cqw] font-extrabold leading-none tracking-tighter text-transparent"
         >
           Mindfries
         </span>
