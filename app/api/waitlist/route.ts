@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 // Wire a real destination by setting WAITLIST_WEBHOOK_URL (Slack/Sheet/Zapier)
 // or swap in Resend/Postgres here. Kept a one-liner swap on purpose.
 export async function POST(req: Request) {
-  let body: { email?: string; designPartner?: boolean };
+  let body: { email?: string; designPartner?: boolean; source?: string };
   try {
     body = await req.json();
   } catch {
@@ -19,6 +19,7 @@ export async function POST(req: Request) {
   const entry = {
     email,
     designPartner: Boolean(body.designPartner),
+    source: typeof body.source === "string" ? body.source.slice(0, 40) : "waitlist",
     at: new Date().toISOString(),
   };
   console.log("[waitlist]", entry);

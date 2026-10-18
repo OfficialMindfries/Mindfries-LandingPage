@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/dashboard"],
+      disallow: ["/api/", "/dashboard", "/studio"],
     },
     sitemap: "https://mindfries.vercel.app/sitemap.xml",
   };
