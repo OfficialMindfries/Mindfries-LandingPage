@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useInView, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
@@ -13,30 +13,37 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
 /**
- * StackPanel — pedagon-style stacked-deck scrolling (opening panels only).
+ * The landing page is a run of full-screen pages, each with the scroll
+ * effect that suits it:
  *
- * Every panel is position:sticky, so as you scroll each new panel slides up
- * and COVERS the pinned one before it; earlier panels' top edges peek out
- * behind by a few px per index (the deck effect).
+ * - DeckPage: the opening two (Hero, How it works) are rounded cards in a
+ *   stacked deck. Each is position:sticky, so How it works slides up and
+ *   covers the pinned hero, whose top edge peeks out behind it.
+ * - Page "parallax": the page's content drifts against the scroll, so it
+ *   settles into place as the page reaches the top of the screen.
+ * - Page "reveal": the content fades and rises in when the page lands, and
+ *   eases back out as it leaves, every time.
+ * - Page "still": the section runs its own scroll animation (Pricing).
  *
- * Pin offset: panels shorter than the viewport pin near the top; taller
- * panels pin only once their bottom edge is on screen, so no content is
- * ever trapped under the fold.
- *
- * On top of the stack, each panel keeps a spring-smoothed entrance glide
- * (slide up + fade in) while it travels into view.
+ * Every page after the deck is square and edge to edge, exactly one screen
+ * tall on desktop (lg+), and a gentle scroll-snap (proximity, see
+ * globals.css) settles the page you stop near. Below lg pages keep their
+ * natural height and nothing snaps. Reduced-motion users get static pages.
  */
-function StackPanel({ children, index }: { children: React.ReactNode; index: number }) {
+
+const spring = { stiffness: 110, damping: 24, mass: 0.5 };
+
+function DeckPage({ children, index }: { children: React.ReactNode; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [top, setTop] = useState<number | null>(null);
+  const peek = 12 + index * 10; // where this card pins; later cards sit lower, so earlier edges peek
+  const [top, setTop] = useState(peek);
 
-  const peek = 16 + index * 10; // where this card pins; later cards sit lower → earlier edges peek
-
+  // A card taller than the screen (below lg, where cards keep their natural
+  // height) pins only once its bottom is on screen, so nothing is trapped under the fold.
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const compute = () =>
-      setTop(Math.min(peek, window.innerHeight - el.offsetHeight - 16));
+    const compute = () => setTop(Math.min(peek, window.innerHeight - el.offsetHeight - 12));
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     window.addEventListener("resize", compute);
@@ -47,66 +54,41 @@ function StackPanel({ children, index }: { children: React.ReactNode; index: num
     };
   }, [peek]);
 
-  // Entrance glide while the panel travels up into view (before it pins)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "start 0.25"],
-  });
-  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 26, mass: 0.4 });
-  const y = useTransform(smooth, [0, 1], [48, 0]);
-  const opacity = useTransform(smooth, [0, 0.6], [0.4, 1]);
-
   return (
-    <div className="sticky" style={{ top: top ?? peek }}>
-      <motion.div
-        ref={ref}
-        style={index === 0 ? undefined : { y, opacity }}
-        className="panel overflow-hidden will-change-transform"
-      >
+    <div className="sticky" style={{ top }}>
+      {/* Same height for both cards (screen minus the deepest peek and a margin), so they line up */}
+      <div ref={ref} className="panel overflow-hidden lg:h-[calc(100svh-2.25rem)] [&>section]:lg:h-full">
         {children}
-      </motion.div>
+      </div>
     </div>
   );
 }
 
-/**
- * Scene — a classy scroll transition for each panel.
- *
- * Panels sit in normal flow (no sticky deck). As a panel rises into view it
- * eases up from a slightly smaller, tilted-back, faded state into place; as
- * it leaves past the top it recedes a touch (scales down and dims) so the
- * next panel takes focus. Everything is driven by scroll position through a
- * spring, so it scrubs smoothly in both directions. Reduced-motion users get
- * static panels.
- */
-function Scene({ children }: { children: React.ReactNode }) {
+function Page({ children, effect }: { children: React.ReactNode; effect: "parallax" | "reveal" | "still" }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 
-  // Entering: from the panel's top touching the viewport bottom until it is a third of the way up
-  const { scrollYProgress: enter } = useScroll({ target: ref, offset: ["start end", "start 0.3"] });
-  // Leaving: from its bottom reaching mid-screen until it has left the top
-  const { scrollYProgress: leave } = useScroll({ target: ref, offset: ["end 0.55", "end start"] });
+  // parallax: from the page entering at the bottom to leaving at the top
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const drift = useTransform(useSpring(scrollYProgress, spring), [0, 1], [90, -90]);
 
-  const spring = { stiffness: 110, damping: 24, mass: 0.5 };
-  const inP = useSpring(enter, spring);
-  const outP = useSpring(leave, spring);
+  // reveal: in when at least 35% of the page is on screen
+  const inView = useInView(ref, { amount: 0.35 });
 
-  const scaleIn = useTransform(inP, [0, 1], [0.9, 1]);
-  const scaleOut = useTransform(outP, [0, 1], [1, 0.95]);
-  const scale = useTransform(() => scaleIn.get() * scaleOut.get());
-  const y = useTransform(inP, [0, 1], [90, 0]);
-  const rotateX = useTransform(inP, [0, 1], [8, 0]);
-  const opacityIn = useTransform(inP, [0, 0.7], [0, 1]);
-  const opacityOut = useTransform(outP, [0, 1], [1, 0.35]);
-  const opacity = useTransform(() => opacityIn.get() * opacityOut.get());
+  const motionProps =
+    reduce || effect === "still"
+      ? {}
+      : effect === "parallax"
+        ? { style: { y: drift } }
+        : {
+            initial: false,
+            animate: inView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0.2, y: 56, scale: 0.98 },
+            transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const },
+          };
 
   return (
-    <div ref={ref} className="[perspective:1600px]">
-      <motion.div
-        style={reduce ? undefined : { scale, y, rotateX, opacity, transformOrigin: "50% 0%" }}
-        className="panel overflow-hidden will-change-transform"
-      >
+    <div ref={ref} className="relative overflow-clip bg-white lg:h-svh lg:snap-start">
+      <motion.div {...motionProps} className="h-full will-change-transform [&>*]:lg:h-full">
         {children}
       </motion.div>
     </div>
@@ -117,53 +99,47 @@ export default function Home() {
   return (
     <>
       <Nav />
-      <main className="space-y-4 px-3 py-3 sm:px-5 sm:py-5">
+      <main data-snap>
         {/* Opening deck: How it works slides up over the pinned hero. The
-            wrapper bounds the sticky panels, so the deck scrolls away as a
-            unit before the transition panels below. */}
-        <div className="space-y-4">
-          <StackPanel index={0}>
+            wrapper bounds the sticky cards, so the deck scrolls away as a
+            unit before the full-screen pages below. */}
+        <div className="space-y-4 px-3 pb-3 pt-3 sm:px-5 lg:snap-start">
+          <DeckPage index={0}>
             <Hero />
-          </StackPanel>
-
-          <StackPanel index={1}>
+          </DeckPage>
+          <DeckPage index={1}>
             <HowItWorks />
-          </StackPanel>
+          </DeckPage>
         </div>
 
-        {/* From here on, each panel eases into view and recedes as it scrolls away */}
-
-        <Scene>
+        <Page effect="parallax">
           <DemoVideo />
-        </Scene>
-
-        <Scene>
+        </Page>
+        <Page effect="reveal">
           <PartnersIntro />
-        </Scene>
-
-        <Scene>
+        </Page>
+        <Page effect="parallax">
           <PartnerVoices />
-        </Scene>
-
-        <Scene>
+        </Page>
+        <Page effect="reveal">
           <JoinConversation />
-        </Scene>
-
-        {/* Pricing deals its plan cards out on scroll, so it skips the Scene transition */}
-        <div className="panel overflow-hidden">
+        </Page>
+        {/* Pricing deals its plan cards out on scroll, so it skips the page effect */}
+        <Page effect="still">
           <Pricing />
+        </Page>
+        <Page effect="parallax">
+          <FAQ />
+        </Page>
+
+        {/* "Let's talk engineering." runs its own pinned reveal (a rounded card opening to full bleed) */}
+        <div className="lg:snap-start">
+          <CTA />
         </div>
 
-        <Scene>
-          <FAQ />
-        </Scene>
-
-        {/* "Let's talk engineering." runs its own pinned reveal, so no Scene */}
-        <CTA />
-
-        <Scene>
+        <Page effect="reveal">
           <Footer />
-        </Scene>
+        </Page>
       </main>
     </>
   );

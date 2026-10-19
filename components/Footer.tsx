@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { Fit } from "./primitives";
 
 /* Footer links. Only items with a real destination are rendered — add an
    href here when a page exists (e.g. Careers, Blog, Privacy, Security, Terms). */
@@ -115,14 +116,15 @@ export default function Footer() {
   return (
     <footer
       ref={ref}
-      className="relative overflow-hidden bg-gradient-to-b from-[#f7f4ff] via-white to-[#faf8ff] px-6 lg:px-12"
+      className="relative overflow-hidden bg-gradient-to-b from-[#f7f4ff] via-white to-[#faf8ff] px-6 lg:flex lg:flex-col lg:pt-20 lg:px-12"
     >
       <Landscape rise={rise} />
 
+      <Fit className="relative">
       <div className="relative mx-auto max-w-6xl">
         {/* closing call to action */}
         <motion.div
-          className="pb-24 pt-20 sm:pb-32 sm:pt-24"
+          className="pb-24 pt-20 sm:pb-32 sm:pt-24 lg:pb-14 lg:pt-2"
           initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           viewport={{ once: true, margin: "-60px" }}
@@ -170,7 +172,7 @@ export default function Footer() {
         </motion.div>
 
         {/* links */}
-        <div className="grid gap-12 pb-12 md:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))]">
+        <div className="grid gap-12 pb-12 lg:pb-8 md:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))]">
           <div>
             <Logo size={30} />
             <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-dim">
@@ -214,7 +216,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-hair py-7 text-[13px] text-dim sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-hair py-7 lg:py-5 text-[13px] text-dim sm:flex-row sm:items-center sm:justify-between">
           <span>© 2026 Mindfries. All rights reserved.</span>
           <span className="flex items-center gap-2">
             Built for a more open engineering world.
@@ -222,6 +224,7 @@ export default function Footer() {
           </span>
         </div>
       </div>
+      </Fit>
     </footer>
   );
 }

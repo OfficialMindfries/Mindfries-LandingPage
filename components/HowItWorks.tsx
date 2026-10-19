@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { HeroHeightSection } from "./primitives";
+import { PageSection } from "./primitives";
 
 /* ---- How it works: four steps from signals to a shortlist ----
    Serif display type over the same soft-violet product cards as the hero.
@@ -389,9 +389,9 @@ function Arrow() {
 
 export default function HowItWorks() {
   return (
-    <HeroHeightSection
+    <PageSection
       id="how-it-works"
-      className="px-6 py-16 sm:py-20 lg:px-12 xl:py-12 [background:radial-gradient(50rem_30rem_at_50%_0%,rgba(124,58,237,0.08),transparent_65%),radial-gradient(40rem_30rem_at_0%_100%,rgba(124,58,237,0.06),transparent_60%)]"
+      className="px-6 py-16 sm:py-20 lg:px-12 lg:pb-10 lg:pt-24 [background:radial-gradient(50rem_30rem_at_50%_0%,rgba(124,58,237,0.08),transparent_65%),radial-gradient(40rem_30rem_at_0%_100%,rgba(124,58,237,0.06),transparent_60%)]"
       contentClassName="mx-auto max-w-[88rem]"
     >
         <motion.div
@@ -452,6 +452,6 @@ export default function HowItWorks() {
             </motion.div>
           ))}
         </div>
-    </HeroHeightSection>
+    </PageSection>
   );
 }

@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { HeroHeightSection } from "./primitives";
+import { PageSection } from "./primitives";
 
 /* ---- Design partners: three stacked panels ----
    1. PartnersIntro    – who we're building with, by sector
@@ -201,9 +201,9 @@ const sectors = [
 
 export function PartnersIntro() {
   return (
-    <HeroHeightSection
+    <PageSection
       id="design-partners"
-      className={`px-6 py-16 sm:py-20 lg:px-12 xl:py-12 ${panelBg}`}
+      className={`px-6 py-16 sm:py-20 lg:px-12 lg:pb-10 lg:pt-24 ${panelBg}`}
       contentClassName="mx-auto max-w-6xl"
     >
       <FadeUp className="text-center">
@@ -243,7 +243,7 @@ export function PartnersIntro() {
           </FadeUp>
         ))}
       </div>
-    </HeroHeightSection>
+    </PageSection>
   );
 }
 
@@ -274,9 +274,9 @@ export function PartnerVoices() {
   };
 
   return (
-    <HeroHeightSection
+    <PageSection
       id="partner-voices"
-      className={`px-6 py-16 sm:py-20 lg:px-12 xl:py-12 ${panelBg}`}
+      className={`px-6 py-16 sm:py-20 lg:px-12 lg:pb-10 lg:pt-24 ${panelBg}`}
       contentClassName="mx-auto max-w-6xl"
     >
       <FadeUp className="text-center">
@@ -333,7 +333,7 @@ export function PartnerVoices() {
         <ArrowButton dir="prev" onClick={() => scroll(-1)} />
         <ArrowButton dir="next" onClick={() => scroll(1)} />
       </div>
-    </HeroHeightSection>
+    </PageSection>
   );
 }
 
@@ -350,9 +350,9 @@ const orbit = [
 
 export function JoinConversation() {
   return (
-    <HeroHeightSection
+    <PageSection
       id="join"
-      className={`px-6 py-16 sm:py-20 lg:px-12 xl:py-12 ${panelBg}`}
+      className={`px-6 py-16 sm:py-20 lg:px-12 lg:pb-10 lg:pt-24 ${panelBg}`}
       contentClassName="mx-auto max-w-6xl"
     >
       <FadeUp className="text-center">
@@ -435,6 +435,6 @@ export function JoinConversation() {
           </div>
         </div>
       </FadeUp>
-    </HeroHeightSection>
+    </PageSection>
   );
 }

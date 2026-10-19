@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Fit } from "./primitives";
 import {
   AnimatePresence,
   motion,
@@ -342,8 +343,9 @@ export default function Pricing() {
     <section
       ref={ref}
       id="pricing"
-      className="relative overflow-hidden px-6 py-10 sm:py-12 lg:px-12 [background:radial-gradient(52rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(30rem_30rem_at_0%_60%,rgba(124,58,237,0.08),transparent_60%),radial-gradient(30rem_30rem_at_100%_60%,rgba(124,58,237,0.08),transparent_60%)]"
+      className="relative overflow-hidden px-6 py-10 sm:py-12 lg:flex lg:flex-col lg:pb-10 lg:pt-24 lg:px-12 [background:radial-gradient(52rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(30rem_30rem_at_0%_60%,rgba(124,58,237,0.08),transparent_60%),radial-gradient(30rem_30rem_at_100%_60%,rgba(124,58,237,0.08),transparent_60%)]"
     >
+      <Fit>
       <div className="mx-auto max-w-[78rem]">
       <motion.div
         className="text-center"
@@ -389,6 +391,7 @@ export default function Pricing() {
         ))}
       </ul>
       </div>
+      </Fit>
     </section>
   );
 }

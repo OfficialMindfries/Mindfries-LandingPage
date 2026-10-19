@@ -189,7 +189,7 @@ export default function CTA() {
   }
 
   return (
-    <section id="access" ref={ref} className="relative -mx-3 sm:-mx-5" style={{ height: "240vh" }}>
+    <section id="access" ref={ref} className="relative" style={{ height: "240vh" }}>
       <div className="sticky top-0 h-screen overflow-hidden">
         <motion.div className="absolute inset-0 bg-white" style={{ clipPath }}>
           <Glows p={p} />

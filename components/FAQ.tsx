@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Fit } from "./primitives";
 
 /* ---- FAQs ----
    Answers only restate what the rest of the site already says. */
@@ -57,7 +58,7 @@ function Item({ q, a, open, onToggle, i }: { q: string; a: string; open: boolean
           onClick={onToggle}
           aria-expanded={open}
           aria-controls={id}
-          className="flex w-full items-center gap-4 px-6 py-5 text-left"
+          className="flex w-full items-center gap-4 px-6 py-5 text-left lg:py-4"
         >
           <span className={`flex-1 text-[16.5px] font-medium ${open ? "text-[#1e1b4b]" : "text-ink/85"}`}>{q}</span>
           <span
@@ -93,7 +94,7 @@ function Item({ q, a, open, onToggle, i }: { q: string; a: string; open: boolean
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.45, ease }}
           >
-            <p className="px-6 pb-6 pr-16 text-[15px] leading-relaxed text-dim">{a}</p>
+            <p className="px-6 pb-6 pr-16 text-[15px] leading-relaxed text-dim lg:pb-5">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -107,8 +108,9 @@ export default function FAQ() {
   return (
     <section
       id="faq"
-      className="relative overflow-hidden px-6 py-16 sm:py-20 lg:px-12 [background:radial-gradient(46rem_30rem_at_0%_0%,rgba(124,58,237,0.09),transparent_65%),radial-gradient(40rem_30rem_at_100%_100%,rgba(124,58,237,0.07),transparent_60%)]"
+      className="relative overflow-hidden px-6 py-16 sm:py-20 lg:flex lg:flex-col lg:pb-10 lg:pt-24 lg:px-12 [background:radial-gradient(46rem_30rem_at_0%_0%,rgba(124,58,237,0.09),transparent_65%),radial-gradient(40rem_30rem_at_100%_100%,rgba(124,58,237,0.07),transparent_60%)]"
     >
+      <Fit>
       <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         <motion.div
           className="lg:self-start"
@@ -140,7 +142,7 @@ export default function FAQ() {
           </a>
         </motion.div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 lg:space-y-2.5">
           {faqs.map((f, i) => (
             <motion.div
               key={f.q}
@@ -154,6 +156,7 @@ export default function FAQ() {
           ))}
         </div>
       </div>
+      </Fit>
     </section>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { Fit } from "./primitives";
 
 /* Point these at the demo video when it's ready. `src` can be a file in
    /public (e.g. "/demo.mp4") or a hosted .mp4/.webm URL; `poster` is an
@@ -74,8 +75,9 @@ export default function DemoVideo() {
   return (
     <section
       id="demo"
-      className="relative overflow-hidden px-6 py-16 sm:py-20 lg:px-12 [background:radial-gradient(50rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(36rem_28rem_at_0%_100%,rgba(124,58,237,0.07),transparent_60%),radial-gradient(36rem_28rem_at_100%_100%,rgba(244,80,47,0.05),transparent_60%)]"
+      className="relative overflow-hidden px-6 py-16 sm:py-20 lg:flex lg:flex-col lg:pb-10 lg:pt-24 lg:px-12 [background:radial-gradient(50rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(36rem_28rem_at_0%_100%,rgba(124,58,237,0.07),transparent_60%),radial-gradient(36rem_28rem_at_100%_100%,rgba(244,80,47,0.05),transparent_60%)]"
     >
+      <Fit>
       <div className="mx-auto max-w-[80rem]">
         <motion.div
           className="text-center"
@@ -103,7 +105,7 @@ export default function DemoVideo() {
         <motion.div
           ref={ref}
           style={{ scale, borderRadius: radius }}
-          className="relative mx-auto mt-10 aspect-video w-full overflow-hidden border border-white/70 bg-[#1e1b4b] shadow-[0_60px_120px_-40px_rgba(76,29,149,0.55),0_0_0_8px_rgba(167,139,250,0.12)]"
+          className="relative mx-auto mt-10 aspect-video w-full overflow-hidden lg:mt-8 lg:max-w-[calc((100svh-28rem)*16/9)] border border-white/70 bg-[#1e1b4b] shadow-[0_60px_120px_-40px_rgba(76,29,149,0.55),0_0_0_8px_rgba(167,139,250,0.12)]"
         >
           {started && DEMO_VIDEO.src ? (
             <video
@@ -206,6 +208,7 @@ export default function DemoVideo() {
           ))}
         </ol>
       </div>
+      </Fit>
     </section>
   );
 }
