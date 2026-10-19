@@ -109,29 +109,6 @@ export function SectionLabel({ index, children }: { index: string; children: str
   );
 }
 
-/* A full-screen page section: from lg up it takes its page's height (set by
-   the page wrapper) and scales its content down to fit via Fit. Below lg it
-   keeps its natural height. */
-export function PageSection({
-  id,
-  className = "",
-  contentClassName = "",
-  children,
-}: {
-  id?: string;
-  className?: string;
-  contentClassName?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section id={id} className={`relative flex flex-col justify-center overflow-hidden ${className}`}>
-      <Fit>
-        <div className={`w-full ${contentClassName}`}>{children}</div>
-      </Fit>
-    </section>
-  );
-}
-
 /* Full-screen pages: from lg up, Fit fills the rest of its section and
    scales its content down (never up) when the content is taller than the
    space, so a page always fits one desktop screen. The section must be a
@@ -204,12 +181,16 @@ export function useDesktop() {
 export function Scene({
   id,
   length = 2.2,
+  inset = 0,
   className = "",
   as: Tag = "section",
   children,
 }: {
   id?: string;
   length?: number;
+  /* Pin the stage this many px below the top (and 14px above the bottom),
+     for a scene that is a card in the stacked deck rather than full bleed */
+  inset?: number;
   className?: string;
   as?: "section" | "footer";
   children: React.ReactNode;
@@ -224,7 +205,10 @@ export function Scene({
 
   return (
     <Tag id={id} ref={ref as React.RefObject<HTMLElement & HTMLDivElement>} className="relative" style={pinned ? { height: `${length * 100}svh` } : undefined}>
-      <div className={`relative overflow-hidden ${pinned ? "sticky top-0 flex h-svh flex-col" : ""} ${className}`}>
+      <div
+        className={`relative overflow-hidden ${pinned ? "sticky top-0 flex h-svh flex-col" : ""} ${className}`}
+        style={pinned && inset ? { top: inset, height: `calc(100svh - ${inset + 14}px)` } : undefined}
+      >
         <SceneProgress.Provider value={pinned ? smooth : finished}>{children}</SceneProgress.Provider>
       </div>
     </Tag>

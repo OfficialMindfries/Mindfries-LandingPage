@@ -15,8 +15,8 @@ import Footer from "@/components/Footer";
  * The landing page is a run of full-screen pages.
  *
  * - The opening two (Hero, How it works) are rounded cards in a stacked
- *   deck: each is position:sticky, so How it works slides up and covers
- *   the pinned hero, whose top edge peeks out behind it.
+ *   deck: How it works slides up and covers the pinned hero, whose top edge
+ *   peeks out behind it, then plays its own "Step-through" scene.
  * - Every page after that is square, edge to edge, and a pinned scene
  *   (Scene in components/primitives.tsx): the screen holds still while
  *   the scroll plays that page's own choreography, the way the "Let's talk
@@ -71,9 +71,9 @@ export default function Home() {
           <DeckPage index={0}>
             <Hero />
           </DeckPage>
-          <DeckPage index={1}>
-            <HowItWorks />
-          </DeckPage>
+          {/* How it works is a pinned scene that is also a deck card: it slides
+              up over the pinned hero, then pins just below its peeking edge */}
+          <HowItWorks />
         </div>
 
         <div className="bg-white">
