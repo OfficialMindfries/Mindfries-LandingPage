@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { Fit } from "./primitives";
+import { AnimatePresence, motion, useTransform, type MotionValue } from "framer-motion";
+import { Fit, MaskLine, Rise, Scene, useBeat, useScene } from "./primitives";
 
 /* Point these at the demo video when it's ready. `src` can be a file in
    /public (e.g. "/demo.mp4") or a hosted .mp4/.webm URL; `poster` is an
@@ -51,17 +51,70 @@ function Poster() {
   );
 }
 
+/* One chapter chip: dim until the scene reaches it, then lit */
+function Chapter({ p, at, i, label, last }: { p: MotionValue<number>; at: number; i: number; label: string; last: boolean }) {
+  const lit = useBeat(p, at, at + 0.06);
+  const bg = useTransform(lit, [0, 1], ["rgba(255,255,255,0.6)", "rgba(255,255,255,1)"]);
+  const border = useTransform(lit, [0, 1], ["rgba(20,22,30,0.08)", "rgba(167,139,250,0.9)"]);
+  const opacity = useTransform(lit, [0, 1], [0.45, 1]);
+  const dot = useTransform(lit, [0, 1], ["#ede9fe", "#7c3aed"]);
+  const dotText = useTransform(lit, [0, 1], ["#7c3aed", "#ffffff"]);
+  const line = useBeat(p, at + 0.04, at + 0.12);
+  return (
+    <li className="flex items-center gap-2">
+      <motion.span
+        style={{ background: bg, borderColor: border, opacity }}
+        className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13.5px] text-ink/80 shadow-sm"
+      >
+        <motion.span style={{ background: dot, color: dotText }} className="grid h-5 w-5 place-items-center rounded-full font-serif text-[11px] font-semibold">
+          {i + 1}
+        </motion.span>
+        {label}
+      </motion.span>
+      {!last && (
+        <span className="relative hidden h-px w-8 overflow-hidden bg-violet-100 sm:block">
+          <motion.span style={{ scaleX: line }} className="absolute inset-0 origin-left bg-violet-500" />
+        </span>
+      )}
+    </li>
+  );
+}
+
+/**
+ * Scene "Cinema": the headline rises out of its mask as the page arrives,
+ * then the player swings up from a small, tilted-back screen to full size
+ * while a violet glow blooms behind it, and the four chapters light up one
+ * after another along a progress line.
+ */
 export default function DemoVideo() {
-  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <Scene
+      id="demo"
+      length={2.4}
+      className="px-6 py-16 sm:py-20 lg:pb-10 lg:pt-24 lg:px-12 [background:radial-gradient(50rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(36rem_28rem_at_0%_100%,rgba(124,58,237,0.07),transparent_60%),radial-gradient(36rem_28rem_at_100%_100%,rgba(244,80,47,0.05),transparent_60%)]"
+    >
+      <Fit>
+        <DemoContent />
+      </Fit>
+    </Scene>
+  );
+}
+
+function DemoContent() {
+  const p = useScene();
   const video = useRef<HTMLVideoElement>(null);
   const [started, setStarted] = useState(false);
   const [comingSoon, setComingSoon] = useState(false);
 
-  // The frame widens and flattens its corners as it scrolls into view
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
-  const p = useSpring(scrollYProgress, { stiffness: 110, damping: 24, mass: 0.5 });
-  const scale = useTransform(p, [0, 1], [0.88, 1]);
-  const radius = useTransform(p, [0, 1], [56, 28]);
+  const head = useBeat(p, 0.02, 0.26);
+  const sub = useBeat(p, 0.14, 0.32);
+  const screen = useBeat(p, 0.2, 0.62);
+  const scale = useTransform(screen, [0, 1], [0.58, 1]);
+  const rotateX = useTransform(screen, [0, 1], [34, 0]);
+  const y = useTransform(screen, [0, 1], [120, 0]);
+  const radius = useTransform(screen, [0, 1], [56, 28]);
+  const glow = useTransform(screen, [0, 1], [0, 1]);
+  const glowScale = useTransform(screen, [0, 1], [0.6, 1.15]);
 
   const play = () => {
     if (!DEMO_VIDEO.src) {
@@ -73,40 +126,41 @@ export default function DemoVideo() {
   };
 
   return (
-    <section
-      id="demo"
-      className="relative overflow-hidden px-6 py-16 sm:py-20 lg:flex lg:flex-col lg:pb-10 lg:pt-24 lg:px-12 [background:radial-gradient(50rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(36rem_28rem_at_0%_100%,rgba(124,58,237,0.07),transparent_60%),radial-gradient(36rem_28rem_at_100%_100%,rgba(244,80,47,0.05),transparent_60%)]"
-    >
-      <Fit>
-      <div className="mx-auto max-w-[80rem]">
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.75, ease }}
-        >
-          <span className="inline-flex items-center gap-2.5 rounded-full border border-hair bg-white/70 px-4 py-1.5 backdrop-blur">
-            <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-accent" />
-            <span className="text-[0.72rem] font-medium uppercase tracking-[0.28em] text-ink/70">Product demo</span>
-          </span>
-          <h2 className="mx-auto mt-5 max-w-4xl text-[clamp(2.3rem,4.8vw,4.25rem)] !font-serif !font-semibold !leading-[1.04] !tracking-[-0.02em] text-[#1e1b4b]">
-            Watch Mindfries{" "}
-            <em className="bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text pr-2 italic text-transparent">
-              in action.
-            </em>
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-[16px] leading-relaxed text-dim sm:text-[17px]">
-            See a hiring team go from scattered signals to a ranked, explainable shortlist.
-          </p>
-        </motion.div>
+      // Everything shares the player's width. On desktop the player is 64% of
+      // the screen's height (16:9), so it fills roughly 40% of the screen.
+      <div className="mx-auto w-full max-w-[80rem] lg:w-[min(100%,calc(64svh*16/9))]">
+        {/* one compact row: headline on the left, the line about it on the right */}
+        <div className="text-center lg:flex lg:items-end lg:justify-between lg:gap-10 lg:text-left">
+          <div>
+            <motion.span style={{ opacity: head }} className="inline-flex items-center gap-2.5 rounded-full border border-hair bg-white/70 px-4 py-1.5 backdrop-blur">
+              <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-accent" />
+              <span className="text-[0.72rem] font-medium uppercase tracking-[0.28em] text-ink/70">Product demo</span>
+            </motion.span>
+            <h2 className="mx-auto mt-4 max-w-4xl text-[clamp(2.3rem,4.8vw,4.25rem)] !font-serif !font-semibold !leading-[1.04] !tracking-[-0.02em] text-[#1e1b4b] lg:mx-0 lg:mt-3 lg:whitespace-nowrap lg:text-[clamp(2.2rem,3.4vw,3.4rem)]">
+              <MaskLine p={head}>
+                Watch Mindfries{" "}
+                <em className="bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text pr-2 italic text-transparent">in action.</em>
+              </MaskLine>
+            </h2>
+          </div>
+          <Rise p={sub} y={16}>
+            <p className="mx-auto mt-4 max-w-2xl text-[16px] leading-relaxed text-dim sm:text-[17px] lg:mx-0 lg:mt-0 lg:max-w-xs lg:pb-2 lg:text-[15px]">
+              See a hiring team go from scattered signals to a ranked, explainable shortlist.
+            </p>
+          </Rise>
+        </div>
 
-        {/* video panel */}
-        <motion.div
-          ref={ref}
-          style={{ scale, borderRadius: radius }}
-          className="relative mx-auto mt-10 aspect-video w-full overflow-hidden lg:mt-8 lg:max-w-[calc((100svh-28rem)*16/9)] border border-white/70 bg-[#1e1b4b] shadow-[0_60px_120px_-40px_rgba(76,29,149,0.55),0_0_0_8px_rgba(167,139,250,0.12)]"
-        >
+        {/* the player, on a stage that tilts it back in perspective */}
+        <div className="relative mt-10 [perspective:1400px] lg:mt-6">
+          <motion.span
+            aria-hidden
+            style={{ opacity: glow, scale: glowScale }}
+            className="pointer-events-none absolute inset-x-[10%] -bottom-10 top-10 rounded-full bg-violet-500/30 blur-[90px]"
+          />
+          <motion.div
+            style={{ scale, rotateX, y, borderRadius: radius, transformOrigin: "50% 100%" }}
+            className="relative mx-auto aspect-video w-full overflow-hidden border border-white/70 bg-[#1e1b4b] shadow-[0_60px_120px_-40px_rgba(76,29,149,0.55),0_0_0_8px_rgba(167,139,250,0.12)]"
+          >
           {started && DEMO_VIDEO.src ? (
             <video
               ref={video}
@@ -191,24 +245,15 @@ export default function DemoVideo() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+          </motion.div>
+        </div>
 
-        {/* chapters */}
-        <ol className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-x-2 gap-y-3">
+        {/* chapters light up in turn */}
+        <ol className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-x-2 gap-y-3 lg:mt-5">
           {chapters.map((c, i) => (
-            <li key={c} className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-hair bg-white/80 px-4 py-2 text-[13.5px] text-ink/80 shadow-sm">
-                <span className="grid h-5 w-5 place-items-center rounded-full bg-violet-100 font-serif text-[11px] font-semibold text-accent">
-                  {i + 1}
-                </span>
-                {c}
-              </span>
-              {i < chapters.length - 1 && <span className="hidden h-px w-6 bg-violet-200 sm:block" />}
-            </li>
+            <Chapter key={c} p={p} at={0.6 + i * 0.08} i={i} label={c} last={i === chapters.length - 1} />
           ))}
         </ol>
       </div>
-      </Fit>
-    </section>
   );
 }

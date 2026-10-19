@@ -1,9 +1,8 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { Fit } from "./primitives";
+import { motion, useTransform, type MotionValue } from "framer-motion";
+import { Fit, MaskLine, Rise, Scene, useBeat, useScene } from "./primitives";
 
 /* Footer links. Only items with a real destination are rendered — add an
    href here when a page exists (e.g. Careers, Blog, Privacy, Security, Terms). */
@@ -52,8 +51,6 @@ const socials = [
   },
 ];
 
-const ease = [0.22, 1, 0.36, 1] as const;
-
 const stroke = {
   fill: "none",
   stroke: "currentColor",
@@ -71,17 +68,18 @@ function Logo({ size = 34 }: { size?: number }) {
   );
 }
 
-/* Dreamy violet landscape: a glowing orb, layered hills and a misty horizon */
-function Landscape({ rise }: { rise: ReturnType<typeof useTransform<number, number>> }) {
+/* Dreamy violet landscape: a glowing orb, layered hills and a misty horizon.
+   The orb and the hills rise at different speeds, like a sunrise. */
+function Landscape({ orb, orbScale, hills }: { orb: MotionValue<number>; orbScale: MotionValue<number>; hills: MotionValue<number> }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 h-[640px] overflow-hidden" aria-hidden>
       {/* orb */}
       <motion.div
-        style={{ y: rise }}
+        style={{ y: orb, scale: orbScale }}
         className="absolute -right-[12%] -top-[28%] h-[900px] w-[900px] rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.95),rgba(237,233,254,0.85)_35%,rgba(196,181,253,0.55)_65%,rgba(167,139,250,0.35))] shadow-[inset_0_0_80px_rgba(255,255,255,0.8)]"
       />
       <span className="absolute right-[18%] top-[30%] h-64 w-64 rounded-full bg-amber-100/60 blur-[90px]" />
-      <svg className="absolute inset-x-0 bottom-0 h-[340px] w-full" viewBox="0 0 1600 340" preserveAspectRatio="none">
+      <motion.svg style={{ y: hills }} className="absolute inset-x-0 bottom-0 h-[340px] w-full" viewBox="0 0 1600 340" preserveAspectRatio="none">
         <defs>
           <linearGradient id="hillA" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#c4b5fd" stopOpacity="0.55" />
@@ -102,46 +100,68 @@ function Landscape({ rise }: { rise: ReturnType<typeof useTransform<number, numb
         <path d="M980 250 C 1100 170, 1200 160, 1290 210 C 1350 150, 1450 100, 1600 70 L 1600 260 L 980 260 Z" fill="url(#hillB)" />
         <path d="M1150 255 C 1260 200, 1360 190, 1440 220 C 1500 200, 1560 190, 1600 195 L 1600 260 L 1150 260 Z" fill="#7c3aed" fillOpacity="0.35" />
         <rect x="0" y="240" width="1600" height="100" fill="url(#mist)" />
-      </svg>
+      </motion.svg>
     </div>
   );
 }
 
+/**
+ * Scene "Sunrise": the last page pins while the orb climbs and the hills
+ * lift beneath it, the closing headline rises out of its masks line by
+ * line, and the links settle in underneath.
+ */
 export default function Footer() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end end"] });
-  const p = useSpring(scrollYProgress, { stiffness: 90, damping: 24, mass: 0.6 });
-  const rise = useTransform(p, [0, 1], [120, 0]);
+  return (
+    <Scene
+      as="footer"
+      length={1.9}
+      className="bg-gradient-to-b from-[#f7f4ff] via-white to-[#faf8ff] px-6 lg:pt-20 lg:px-12"
+    >
+      <FooterContent />
+    </Scene>
+  );
+}
+
+function FooterContent() {
+  const p = useScene();
+  const sky = useBeat(p, 0, 0.62);
+  const orb = useTransform(sky, [0, 1], [320, 0]);
+  const orbScale = useTransform(sky, [0, 1], [0.8, 1]);
+  const hills = useTransform(useBeat(p, 0.06, 0.58), [0, 1], [180, 0]);
+
+  const logo = useBeat(p, 0.06, 0.2);
+  const l1 = useBeat(p, 0.12, 0.32);
+  const l2 = useBeat(p, 0.2, 0.4);
+  const l3 = useBeat(p, 0.28, 0.48);
+  const cta = useBeat(p, 0.4, 0.56);
+  const links = useBeat(p, 0.54, 0.72);
+  const base = useBeat(p, 0.64, 0.8);
 
   return (
-    <footer
-      ref={ref}
-      className="relative overflow-hidden bg-gradient-to-b from-[#f7f4ff] via-white to-[#faf8ff] px-6 lg:flex lg:flex-col lg:pt-20 lg:px-12"
-    >
-      <Landscape rise={rise} />
+    <>
+      <Landscape orb={orb} orbScale={orbScale} hills={hills} />
 
       <Fit className="relative">
       <div className="relative mx-auto max-w-6xl">
         {/* closing call to action */}
-        <motion.div
-          className="pb-24 pt-20 sm:pb-32 sm:pt-24 lg:pb-14 lg:pt-2"
-          initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.8, ease }}
-        >
-          <Logo />
+        <div className="pb-24 pt-20 sm:pb-32 sm:pt-24 lg:pb-14 lg:pt-2">
+          <Rise p={logo} y={12}>
+            <Logo />
+          </Rise>
           <h2 className="mt-10 max-w-2xl text-[clamp(2.6rem,5.6vw,4.75rem)] !font-serif !font-normal !leading-[1.04] !tracking-[-0.02em] text-[#1e1b4b]">
-            A better way
-            <br />
-            to hire <span className="font-semibold">engineers</span>
-            <br />
-            is{" "}
-            <em className="bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text pr-1 font-semibold italic text-transparent">
-              possible
-            </em>
-            .
+            <MaskLine p={l1}>A better way</MaskLine>
+            <MaskLine p={l2}>
+              to hire <span className="font-semibold">engineers</span>
+            </MaskLine>
+            <MaskLine p={l3}>
+              is{" "}
+              <em className="bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text pr-1 font-semibold italic text-transparent">
+                possible
+              </em>
+              .
+            </MaskLine>
           </h2>
+          <Rise p={cta} y={20}>
           <p className="mt-6 max-w-md text-[17px] leading-relaxed text-dim">
             Join forward-thinking teams building with engineering evidence.
           </p>
@@ -169,9 +189,10 @@ export default function Footer() {
               </svg>
             </a>
           </div>
-        </motion.div>
+          </Rise>
+        </div>
 
-        {/* links */}
+        <Rise p={links} y={30}>
         <div className="grid gap-12 pb-12 lg:pb-8 md:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))]">
           <div>
             <Logo size={30} />
@@ -216,6 +237,9 @@ export default function Footer() {
           ))}
         </div>
 
+        </Rise>
+
+        <Rise p={base} y={16}>
         <div className="flex flex-col gap-3 border-t border-hair py-7 lg:py-5 text-[13px] text-dim sm:flex-row sm:items-center sm:justify-between">
           <span>© 2026 Mindfries. All rights reserved.</span>
           <span className="flex items-center gap-2">
@@ -223,8 +247,9 @@ export default function Footer() {
             <span className="h-2 w-2 rounded-full bg-accent" />
           </span>
         </div>
+        </Rise>
       </div>
       </Fit>
-    </footer>
+    </>
   );
 }

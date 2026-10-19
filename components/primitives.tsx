@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import {
   motion,
   useInView,
   useMotionValue,
+  useReducedMotion,
+  useScroll,
   useSpring,
   useTransform,
+  type MotionValue,
   type Variants,
 } from "framer-motion";
 
@@ -106,29 +109,6 @@ export function SectionLabel({ index, children }: { index: string; children: str
   );
 }
 
-/* A full-screen page section: from lg up it takes its page's height (set by
-   the page wrapper) and scales its content down to fit via Fit. Below lg it
-   keeps its natural height. */
-export function PageSection({
-  id,
-  className = "",
-  contentClassName = "",
-  children,
-}: {
-  id?: string;
-  className?: string;
-  contentClassName?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section id={id} className={`relative flex flex-col justify-center overflow-hidden ${className}`}>
-      <Fit>
-        <div className={`w-full ${contentClassName}`}>{children}</div>
-      </Fit>
-    </section>
-  );
-}
-
 /* Full-screen pages: from lg up, Fit fills the rest of its section and
    scales its content down (never up) when the content is taller than the
    space, so a page always fits one desktop screen. The section must be a
@@ -166,6 +146,107 @@ export function Fit({ children, className = "" }: { children: React.ReactNode; c
         {children}
       </div>
     </div>
+  );
+}
+
+/* ---------- Pinned scenes ----------
+   Scene pins a full-screen stage while the page scrolls through a taller
+   runway (`length` screens), and hands its children one progress value,
+   0 → 1, through useScene(). Each page turns that into its own
+   choreography, the way the "Let's talk engineering." CTA does.
+
+   Progress starts while the page is still rising into view (its top at 60%
+   of the screen), so by the time the stage pins, the opening beat (usually
+   the headline) has already played; a link that jumps to the page never
+   lands on an empty stage. Roughly: 0 to 0.3 plays during the entry, 0.3 to
+   0.9 while pinned, and the last stretch holds the finished page.
+
+   Below lg, and for reduced-motion users, nothing pins: the stage is a
+   normal section and progress is fixed at 1, the finished state. */
+
+const SceneProgress = createContext<MotionValue<number> | null>(null);
+
+export function useDesktop() {
+  const [desktop, setDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(FIT_QUERY);
+    const update = () => setDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return desktop;
+}
+
+export function Scene({
+  id,
+  length = 2.2,
+  inset = 0,
+  className = "",
+  as: Tag = "section",
+  children,
+}: {
+  id?: string;
+  length?: number;
+  /* Pin the stage this many px below the top (and 14px above the bottom),
+     for a scene that is a card in the stacked deck rather than full bleed */
+  inset?: number;
+  className?: string;
+  as?: "section" | "footer";
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  const pinned = useDesktop() && !reduce;
+
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.6", "end end"] });
+  const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.4 });
+  const finished = useMotionValue(1);
+
+  return (
+    <Tag id={id} ref={ref as React.RefObject<HTMLElement & HTMLDivElement>} className="relative" style={pinned ? { height: `${length * 100}svh` } : undefined}>
+      <div
+        className={`relative overflow-hidden ${pinned ? "sticky top-0 flex h-svh flex-col" : ""} ${className}`}
+        style={pinned && inset ? { top: inset, height: `calc(100svh - ${inset + 14}px)` } : undefined}
+      >
+        <SceneProgress.Provider value={pinned ? smooth : finished}>{children}</SceneProgress.Provider>
+      </div>
+    </Tag>
+  );
+}
+
+/* The current scene's progress (1 outside a scene) */
+export function useScene() {
+  const p = useContext(SceneProgress);
+  const one = useMotionValue(1);
+  return p ?? one;
+}
+
+/* 0 → 1 as `p` moves from `from` to `to` (clamped) */
+export function useBeat(p: MotionValue<number>, from: number, to: number) {
+  return useTransform(p, [from, to], [0, 1], { clamp: true });
+}
+
+/* A headline line that rises out of its own mask as `p` goes 0 → 1 */
+export function MaskLine({ p, children, className = "" }: { p: MotionValue<number>; children: React.ReactNode; className?: string }) {
+  const y = useTransform(p, [0, 1], ["105%", "0%"]);
+  const skew = useTransform(p, [0, 1], [6, 0]);
+  return (
+    <span className="block overflow-hidden pb-[0.12em]">
+      <motion.span className={`block ${className}`} style={{ y, skewY: skew }}>
+        {children}
+      </motion.span>
+    </span>
+  );
+}
+
+/* Rises and fades in as `p` goes 0 → 1 */
+export function Rise({ p, y = 40, className, children }: { p: MotionValue<number>; y?: number; className?: string; children: React.ReactNode }) {
+  const ty = useTransform(p, [0, 1], [y, 0]);
+  return (
+    <motion.div className={className} style={{ opacity: p, y: ty }}>
+      {children}
+    </motion.div>
   );
 }
 

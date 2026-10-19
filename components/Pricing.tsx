@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Fit } from "./primitives";
+import { useEffect, useState } from "react";
+import { Fit, MaskLine, Rise, Scene, useBeat, useScene } from "./primitives";
 import {
   AnimatePresence,
   motion,
   useReducedMotion,
-  useScroll,
-  useSpring,
   useTransform,
   motionValue,
   type MotionValue,
@@ -18,7 +16,7 @@ const zero = motionValue(0);
 /* ---- Pricing: three plans with a monthly / annual toggle ----
    Annual billing takes 20% off the monthly price.
 
-   Scroll effect — "deal out": while the section scrolls up into view, the
+   Scroll effect — "deal out": while the pinned pricing scene plays, the
    three plan cards start gathered in the centre like a fanned deck (side
    cards tucked behind Growth, tilted and lowered) and deal out into their
    columns as the section settles. Scroll back up and they gather again.
@@ -328,48 +326,62 @@ function BillingToggle({ annual, onChange }: { annual: boolean; onChange: (annua
   );
 }
 
+/**
+ * Scene "Card deal": while the page is pinned, the headline rises out of
+ * its mask, the three plans start gathered in a tilted stack behind Growth
+ * and deal out into their columns, and the assurances fade in last.
+ */
 export default function Pricing() {
-  const [annual, setAnnual] = useState(false);
-  const ref = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
-  const wide = useMediaQuery("(min-width: 1024px)"); // cards sit in three columns
-
-  // 0 while the section's top enters the viewport → 1 once it is a fifth of the way down from the top
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "start 0.15"] });
-  const deal = useSpring(scrollYProgress, { stiffness: 90, damping: 22, mass: 0.6 });
-  const dealing = wide && !reduce;
-
   return (
-    <section
-      ref={ref}
+    <Scene
       id="pricing"
-      className="relative overflow-hidden px-6 py-10 sm:py-12 lg:flex lg:flex-col lg:pb-10 lg:pt-24 lg:px-12 [background:radial-gradient(52rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(30rem_30rem_at_0%_60%,rgba(124,58,237,0.08),transparent_60%),radial-gradient(30rem_30rem_at_100%_60%,rgba(124,58,237,0.08),transparent_60%)]"
+      length={2.2}
+      className="px-6 py-10 sm:py-12 lg:pb-10 lg:pt-24 lg:px-12 [background:radial-gradient(52rem_30rem_at_50%_0%,rgba(124,58,237,0.1),transparent_65%),radial-gradient(30rem_30rem_at_0%_60%,rgba(124,58,237,0.08),transparent_60%),radial-gradient(30rem_30rem_at_100%_60%,rgba(124,58,237,0.08),transparent_60%)]"
     >
       <Fit>
+        <PricingContent />
+      </Fit>
+    </Scene>
+  );
+}
+
+function PricingContent() {
+  const [annual, setAnnual] = useState(false);
+  const p = useScene();
+  const reduce = useReducedMotion();
+  const wide = useMediaQuery("(min-width: 1024px)"); // cards sit in three columns
+  const dealing = wide && !reduce;
+
+  const head = useBeat(p, 0.02, 0.24);
+  const sub = useBeat(p, 0.12, 0.3);
+  const deal = useBeat(p, 0.32, 0.74);
+  const rest = useBeat(p, 0.74, 0.88);
+
+  return (
       <div className="mx-auto max-w-[78rem]">
-      <motion.div
-        className="text-center"
-        initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.75, ease }}
-      >
+      <div className="text-center">
         <span className="inline-flex items-center gap-2.5 rounded-full border border-hair bg-white/70 px-4 py-1.5 backdrop-blur">
           <span className="h-1.5 w-1.5 rounded-full bg-accent" />
           <span className="text-[0.72rem] font-medium uppercase tracking-[0.28em] text-ink/70">Pricing</span>
         </span>
         <h2 className="mx-auto mt-4 max-w-5xl text-[clamp(2.2rem,4vw,3.6rem)] !font-serif !font-semibold !leading-[1.04] !tracking-[-0.02em] text-[#1e1b4b]">
-          Invest in better <br className="lg:hidden" />
-          <em className="bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text pr-2 italic text-transparent">
-            hiring decisions.
-          </em>
+          <MaskLine p={head}>
+            Invest in better <br className="lg:hidden" />
+            <em className="bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text pr-2 italic text-transparent">
+              hiring decisions.
+            </em>
+          </MaskLine>
         </h2>
-        <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-dim sm:text-[16px]">
-          Simple, transparent plans to help you hire engineers with confidence.
-        </p>
-      </motion.div>
+        <Rise p={sub} y={14}>
+          <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-dim sm:text-[16px]">
+            Simple, transparent plans to help you hire engineers with confidence.
+          </p>
+        </Rise>
+      </div>
 
-      <BillingToggle annual={annual} onChange={setAnnual} />
+      <Rise p={sub} y={14}>
+        <BillingToggle annual={annual} onChange={setAnnual} />
+      </Rise>
 
       <div className="mt-7 grid items-stretch gap-6 lg:grid-cols-3 xl:gap-8">
         {plans.map((plan, i) => (
@@ -377,6 +389,7 @@ export default function Pricing() {
         ))}
       </div>
 
+      <Rise p={rest} y={20}>
       <ul className="mt-6 grid gap-6 border-t border-hair pt-4 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-hair">
         {assurances.map((a) => (
           <li key={a.title} className="flex items-center gap-4 lg:px-6 lg:first:pl-0">
@@ -390,8 +403,7 @@ export default function Pricing() {
           </li>
         ))}
       </ul>
+      </Rise>
       </div>
-      </Fit>
-    </section>
   );
 }

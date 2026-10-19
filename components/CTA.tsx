@@ -181,7 +181,7 @@ export default function CTA() {
 
   if (reduce) {
     return (
-      <section id="access" className="panel relative overflow-hidden bg-white py-32">
+      <section id="access" className="relative overflow-hidden bg-white py-32">
         <Glows />
         <Content />
       </section>
