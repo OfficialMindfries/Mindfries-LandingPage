@@ -106,13 +106,10 @@ export function SectionLabel({ index, children }: { index: string; children: str
   );
 }
 
-/* Stack panels that should match the hero: from xl up the section takes
-   exactly the hero's height (#top) and scales its content down to fit if
-   needed. Below xl it keeps its natural height. */
-const LOCK_QUERY = "(min-width: 1280px)";
-const LOCK_PAD_Y = 48; // xl:py-12, per side
-
-export function HeroHeightSection({
+/* A full-screen page section: from lg up it takes its page's height (set by
+   the page wrapper) and scales its content down to fit via Fit. Below lg it
+   keeps its natural height. */
+export function PageSection({
   id,
   className = "",
   contentClassName = "",
@@ -123,22 +120,35 @@ export function HeroHeightSection({
   contentClassName?: string;
   children: React.ReactNode;
 }) {
-  const content = useRef<HTMLDivElement>(null);
-  const [lock, setLock] = useState<{ height: number; scale: number; natural: number } | null>(null);
+  return (
+    <section id={id} className={`relative flex flex-col justify-center overflow-hidden ${className}`}>
+      <Fit>
+        <div className={`w-full ${contentClassName}`}>{children}</div>
+      </Fit>
+    </section>
+  );
+}
+
+/* Full-screen pages: from lg up, Fit fills the rest of its section and
+   scales its content down (never up) when the content is taller than the
+   space, so a page always fits one desktop screen. The section must be a
+   flex column with a definite height. Below lg it is a plain wrapper. */
+const FIT_QUERY = "(min-width: 1024px)";
+
+export function Fit({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const box = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const hero = document.getElementById("top");
-    const el = content.current;
-    if (!hero || !el) return;
-    const mq = window.matchMedia(LOCK_QUERY);
-    const update = () => {
-      if (!mq.matches) return setLock(null);
-      const height = hero.offsetHeight;
-      const natural = el.offsetHeight; // layout height, unaffected by transform
-      setLock({ height, natural, scale: Math.min(1, (height - LOCK_PAD_Y * 2) / natural) });
-    };
+    const b = box.current;
+    const el = inner.current;
+    if (!b || !el) return;
+    const mq = window.matchMedia(FIT_QUERY);
+    // offsetHeight is the layout height, unaffected by the transform
+    const update = () => setScale(mq.matches ? Math.min(1, b.clientHeight / el.offsetHeight) : 1);
     const ro = new ResizeObserver(update);
-    ro.observe(hero);
+    ro.observe(b);
     ro.observe(el);
     mq.addEventListener("change", update);
     window.addEventListener("resize", update);
@@ -151,23 +161,11 @@ export function HeroHeightSection({
   }, []);
 
   return (
-    <section
-      id={id}
-      className={`relative flex flex-col justify-center overflow-hidden ${className}`}
-      style={lock ? { height: lock.height } : undefined}
-    >
-      <div
-        ref={content}
-        className={`w-full origin-top ${contentClassName}`}
-        style={
-          lock && lock.scale < 1
-            ? { transform: `scale(${lock.scale})`, marginBottom: -lock.natural * (1 - lock.scale) }
-            : undefined
-        }
-      >
+    <div ref={box} className={`lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:justify-center ${className}`}>
+      <div ref={inner} className="w-full shrink-0 origin-center" style={scale < 1 ? { transform: `scale(${scale})` } : undefined}>
         {children}
       </div>
-    </section>
+    </div>
   );
 }
 
