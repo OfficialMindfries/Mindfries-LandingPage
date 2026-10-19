@@ -464,7 +464,7 @@ function Step({ s, i, p }: { s: (typeof steps)[number]; i: number; p: MotionValu
   const Visual = s.Visual;
   return (
     <motion.div className="relative flex flex-col" style={{ opacity, y }}>
-      <div className={`text-center ${i === 1 || i === 2 ? "xl:mt-[14px]" : ""}`}>
+      <div className="text-center">
         <motion.span
           style={{ background: badgeBg, color: badgeText }}
           className="relative mx-auto grid h-10 w-10 place-items-center rounded-full font-serif text-[18px] font-semibold ring-8 ring-violet-50"
@@ -474,7 +474,7 @@ function Step({ s, i, p }: { s: (typeof steps)[number]; i: number; p: MotionValu
         <h3 className="mt-3 font-serif text-[22px] font-semibold tracking-tight text-[#1e1b4b]">{s.title}</h3>
         <p className="mx-auto mt-1 max-w-[16rem] text-[13px] text-dim">{s.body}</p>
       </div>
-      <div className="relative mt-6 flex-1">
+      <div className="relative mt-6 flex flex-1 items-center">
         <Fit>
           <Visual t={t} />
         </Fit>
@@ -524,14 +524,14 @@ function HowItWorksContent() {
       <div className="relative mt-12 -mb-24 hidden h-24 xl:block" aria-hidden>
         <svg className="absolute inset-x-0 top-0 h-24 w-full overflow-visible text-violet-300" viewBox="0 0 1000 96" preserveAspectRatio="none">
           <path
-            d="M125 20 C 210 -14, 300 26, 375 34 C 440 40, 470 16, 500 16 C 530 16, 560 40, 625 34 C 700 26, 790 -14, 875 20"
+            d="M125 20 C 210 -6, 290 -6, 375 20 S 540 46, 625 20 S 790 -6, 875 20"
             fill="none"
             stroke="#ede9fe"
             strokeWidth="1.3"
             vectorEffect="non-scaling-stroke"
           />
           <motion.path
-            d="M125 20 C 210 -14, 300 26, 375 34 C 440 40, 470 16, 500 16 C 530 16, 560 40, 625 34 C 700 26, 790 -14, 875 20"
+            d="M125 20 C 210 -6, 290 -6, 375 20 S 540 46, 625 20 S 790 -6, 875 20"
             fill="none"
             stroke="#8b5cf6"
             strokeWidth="1.6"
