@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
@@ -13,25 +12,21 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
 /**
- * The landing page is a run of full-screen pages, each with the scroll
- * effect that suits it:
+ * The landing page is a run of full-screen pages.
  *
- * - DeckPage: the opening two (Hero, How it works) are rounded cards in a
- *   stacked deck. Each is position:sticky, so How it works slides up and
- *   covers the pinned hero, whose top edge peeks out behind it.
- * - Page "parallax": the page's content drifts against the scroll, so it
- *   settles into place as the page reaches the top of the screen.
- * - Page "reveal": the content fades and rises in when the page lands, and
- *   eases back out as it leaves, every time.
- * - Page "still": the section runs its own scroll animation (Pricing).
+ * - The opening two (Hero, How it works) are rounded cards in a stacked
+ *   deck: each is position:sticky, so How it works slides up and covers
+ *   the pinned hero, whose top edge peeks out behind it.
+ * - Every page after that is square, edge to edge, and a pinned scene
+ *   (Scene in components/primitives.tsx): the screen holds still while
+ *   the scroll plays that page's own choreography, the way the "Let's talk
+ *   engineering." CTA does. Demo "Cinema", Design partners "Word by word",
+ *   Partner voices "Horizontal ride", Join "Assemble", Pricing "Card deal",
+ *   FAQ "Guided tour", CTA, Footer "Sunrise".
  *
- * Every page after the deck is square and edge to edge, exactly one screen
- * tall on desktop (lg+), and a gentle scroll-snap (proximity, see
- * globals.css) settles the page you stop near. Below lg pages keep their
- * natural height and nothing snaps. Reduced-motion users get static pages.
+ * Below lg, and for reduced-motion users, nothing pins: pages keep their
+ * natural height and show their finished state.
  */
-
-const spring = { stiffness: 110, damping: 24, mass: 0.5 };
 
 function DeckPage({ children, index }: { children: React.ReactNode; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -64,46 +59,15 @@ function DeckPage({ children, index }: { children: React.ReactNode; index: numbe
   );
 }
 
-function Page({ children, effect }: { children: React.ReactNode; effect: "parallax" | "reveal" | "still" }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
-
-  // parallax: from the page entering at the bottom to leaving at the top
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const drift = useTransform(useSpring(scrollYProgress, spring), [0, 1], [90, -90]);
-
-  // reveal: in when at least 35% of the page is on screen
-  const inView = useInView(ref, { amount: 0.35 });
-
-  const motionProps =
-    reduce || effect === "still"
-      ? {}
-      : effect === "parallax"
-        ? { style: { y: drift } }
-        : {
-            initial: false,
-            animate: inView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0.2, y: 56, scale: 0.98 },
-            transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const },
-          };
-
-  return (
-    <div ref={ref} className="relative overflow-clip bg-white lg:h-svh lg:snap-start">
-      <motion.div {...motionProps} className="h-full will-change-transform [&>*]:lg:h-full">
-        {children}
-      </motion.div>
-    </div>
-  );
-}
-
 export default function Home() {
   return (
     <>
       <Nav />
-      <main data-snap>
+      <main>
         {/* Opening deck: How it works slides up over the pinned hero. The
             wrapper bounds the sticky cards, so the deck scrolls away as a
-            unit before the full-screen pages below. */}
-        <div className="space-y-4 px-3 pb-3 pt-3 sm:px-5 lg:snap-start">
+            unit before the scenes below. */}
+        <div className="space-y-4 px-3 pb-3 pt-3 sm:px-5">
           <DeckPage index={0}>
             <Hero />
           </DeckPage>
@@ -112,34 +76,16 @@ export default function Home() {
           </DeckPage>
         </div>
 
-        <Page effect="parallax">
+        <div className="bg-white">
           <DemoVideo />
-        </Page>
-        <Page effect="reveal">
           <PartnersIntro />
-        </Page>
-        <Page effect="parallax">
           <PartnerVoices />
-        </Page>
-        <Page effect="reveal">
           <JoinConversation />
-        </Page>
-        {/* Pricing deals its plan cards out on scroll, so it skips the page effect */}
-        <Page effect="still">
           <Pricing />
-        </Page>
-        <Page effect="parallax">
           <FAQ />
-        </Page>
-
-        {/* "Let's talk engineering." runs its own pinned reveal (a rounded card opening to full bleed) */}
-        <div className="lg:snap-start">
           <CTA />
-        </div>
-
-        <Page effect="reveal">
           <Footer />
-        </Page>
+        </div>
       </main>
     </>
   );

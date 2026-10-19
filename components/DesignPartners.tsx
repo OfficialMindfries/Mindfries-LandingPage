@@ -1,17 +1,15 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { PageSection } from "./primitives";
+import { motion, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
+import { Fit, MaskLine, Rise, Scene, useBeat, useDesktop, useScene } from "./primitives";
 
-/* ---- Design partners: three stacked panels ----
-   1. PartnersIntro    – who we're building with, by sector
-   2. PartnerVoices    – what each design partner told us (carousel)
-   3. JoinConversation – the partner teams + a call to join them
+/* ---- Design partners: three pinned scenes ----
+   1. PartnersIntro    – who we're building with, by sector ("Word by word")
+   2. PartnerVoices    – what each design partner told us ("Horizontal ride")
+   3. JoinConversation – the partner teams + a call to join them ("Assemble")
    Everything here comes from real design-partner conversations. */
-
-const ease = [0.22, 1, 0.36, 1] as const;
 
 const stroke = {
   fill: "none",
@@ -141,20 +139,6 @@ const Accent = ({ children }: { children: string }) => (
   <em className="bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text pr-1 italic text-transparent">{children}</em>
 );
 
-function FadeUp({ children, delay = 0, className }: { children: React.ReactNode; delay?: number; className?: string }) {
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.75, delay, ease }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 const panelBg =
   "[background:radial-gradient(48rem_30rem_at_50%_0%,rgba(124,58,237,0.08),transparent_65%),radial-gradient(36rem_28rem_at_100%_100%,rgba(124,58,237,0.07),transparent_60%)]";
 
@@ -199,27 +183,76 @@ const sectors = [
   },
 ];
 
+const stage = `px-6 py-16 sm:py-20 lg:px-12 lg:pb-10 lg:pt-24 ${panelBg}`;
+
+/* A headline word that lights up (fades in, sharpens, lifts) when the scene reaches it */
+function Word({ p, at, children }: { p: MotionValue<number>; at: number; children: React.ReactNode }) {
+  const lit = useBeat(p, at, at + 0.09);
+  const opacity = useTransform(lit, [0, 1], [0.12, 1]);
+  const filter = useTransform(lit, (v) => `blur(${(1 - v) * 6}px)`);
+  const y = useTransform(lit, [0, 1], [12, 0]);
+  return (
+    <motion.span style={{ opacity, filter, y }} className="inline-block">
+      {children}
+    </motion.span>
+  );
+}
+
+/* A sector card that fans in from below, tilted away from the centre */
+function SectorCard({ p, i, children }: { p: MotionValue<number>; i: number; children: React.ReactNode }) {
+  const t = useBeat(p, 0.42 + i * 0.08, 0.64 + i * 0.08);
+  const y = useTransform(t, [0, 1], [180, 0]);
+  const rotate = useTransform(t, [0, 1], [(i - 1) * 12, 0]);
+  const scale = useTransform(t, [0, 1], [0.85, 1]);
+  return <motion.div style={{ opacity: t, y, rotate, scale }}>{children}</motion.div>;
+}
+
+/**
+ * Scene "Word by word": the headline lights up one word at a time as you
+ * scroll, the line beneath fades in, then the three sector cards fan in.
+ */
 export function PartnersIntro() {
   return (
-    <PageSection
-      id="design-partners"
-      className={`px-6 py-16 sm:py-20 lg:px-12 lg:pb-10 lg:pt-24 ${panelBg}`}
-      contentClassName="mx-auto max-w-6xl"
-    >
-      <FadeUp className="text-center">
-        <Eyebrow>Design partners</Eyebrow>
+    <Scene id="design-partners" length={2.1} className={stage}>
+      <Fit>
+        <div className="mx-auto max-w-6xl">
+          <PartnersIntroContent />
+        </div>
+      </Fit>
+    </Scene>
+  );
+}
+
+function PartnersIntroContent() {
+  const p = useScene();
+  const eyebrow = useBeat(p, 0, 0.1);
+  const line = useBeat(p, 0.34, 0.46);
+  const words: React.ReactNode[] = ["Built", "with", "the", "people", "hiring", <Accent key="e">engineers</Accent>, "now."];
+  return (
+    <>
+      <div className="text-center">
+        <Rise p={eyebrow} y={10}>
+          <Eyebrow>Design partners</Eyebrow>
+        </Rise>
         <Heading className="mx-auto mt-4 max-w-3xl text-[clamp(2.4rem,5vw,4.5rem)]">
-          Built with the people hiring <Accent>engineers</Accent> now.
+          {words.map((w, i) => (
+            <span key={i}>
+              <Word p={p} at={0.04 + i * 0.045}>{w}</Word>
+              {i < words.length - 1 && " "}
+            </span>
+          ))}
         </Heading>
-        <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-dim sm:text-base">
-          Conversations with founders and hiring leaders across health-tech, infrastructure and AI are
-          helping shape Mindfries.
-        </p>
-      </FadeUp>
+        <Rise p={line} y={16}>
+          <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-dim sm:text-base">
+            Conversations with founders and hiring leaders across health-tech, infrastructure and AI are
+            helping shape Mindfries.
+          </p>
+        </Rise>
+      </div>
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">
         {sectors.map((s, i) => (
-          <FadeUp key={s.title} delay={0.1 + i * 0.1}>
+          <SectorCard key={s.title} p={p} i={i}>
             <div className="group relative h-44 overflow-hidden rounded-3xl border border-white/80 bg-gradient-to-br from-white via-white to-violet-100/70 p-6 shadow-[0_30px_60px_-34px_rgba(76,29,149,0.35)] transition-transform duration-500 hover:-translate-y-1">
               <svg
                 className="pointer-events-none absolute -right-4 top-1/2 h-36 w-36 -translate-y-1/2 text-violet-300/70 transition-transform duration-700 group-hover:scale-105"
@@ -240,10 +273,10 @@ export function PartnersIntro() {
                 <span className="font-medium text-ink/80">{s.company}</span>
               </p>
             </div>
-          </FadeUp>
+          </SectorCard>
         ))}
       </div>
-    </PageSection>
+    </>
   );
 }
 
@@ -262,8 +295,79 @@ function ArrowButton({ dir, onClick }: { dir: "prev" | "next"; onClick: () => vo
   );
 }
 
+/* A voice card that rises in as the scene opens */
+function VoiceCard({ p, i, partner }: { p: MotionValue<number>; i: number; partner: Partner }) {
+  const t = useBeat(p, 0.16 + i * 0.04, 0.32 + i * 0.04);
+  const y = useTransform(t, [0, 1], [60, 0]);
+  return (
+    <motion.article
+      data-card
+      style={{ opacity: t, y }}
+      className="flex w-[85%] shrink-0 snap-start flex-col rounded-3xl border border-hair bg-white/85 p-6 shadow-[0_24px_50px_-34px_rgba(76,29,149,0.45)] sm:w-[calc((100%-20px)/2)] lg:w-[calc((100%-40px)/2.6)] xl:w-[calc((100%-60px)/3.2)]"
+    >
+      <div className="flex items-end justify-between">
+        <Avatar name={partner.name} grad={partner.grad} />
+        <CompanyLogo company={partner.company} size={36} />
+      </div>
+      <p className="mt-5 font-serif text-[19px] font-semibold leading-tight text-[#1e1b4b]">{partner.name}</p>
+      <p className="mt-1 text-[13px] text-dim">
+        {partner.role} · <span className="font-medium text-ink/80">{partner.company}</span>
+      </p>
+      <p className="mt-4 flex-1 text-[13.5px] leading-relaxed text-ink/75">{partner.note}</p>
+      <span className="mt-5 w-fit rounded-full bg-violet-50 px-3 py-1 text-[12px] font-medium text-violet-700">
+        Design partner
+      </span>
+    </motion.article>
+  );
+}
+
+/**
+ * Scene "Horizontal ride": on desktop, scrolling down slides the partner
+ * cards sideways across the pinned page, with a progress line beneath.
+ * Elsewhere it is a swipeable carousel with arrow buttons.
+ */
 export function PartnerVoices() {
+  return (
+    <Scene id="partner-voices" length={3} className={stage}>
+      <Fit>
+        <div className="mx-auto max-w-6xl">
+          <PartnerVoicesContent />
+        </div>
+      </Fit>
+    </Scene>
+  );
+}
+
+function PartnerVoicesContent() {
+  const p = useScene();
+  const reduce = useReducedMotion();
+  const ride = useDesktop() && !reduce;
+  const box = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
+  const [overflow, setOverflow] = useState(0);
+
+  // How far the track must travel for its last card to reach the right edge
+  useEffect(() => {
+    const b = box.current;
+    const t = track.current;
+    if (!b || !t) return;
+    const update = () => setOverflow(Math.max(0, t.scrollWidth - b.clientWidth));
+    const ro = new ResizeObserver(update);
+    ro.observe(b);
+    ro.observe(t);
+    window.addEventListener("resize", update);
+    update();
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const eyebrow = useBeat(p, 0, 0.1);
+  const head = useBeat(p, 0.02, 0.22);
+  const line = useBeat(p, 0.12, 0.28);
+  const travel = useBeat(p, 0.3, 0.92);
+  const x = useTransform(travel, (v) => -v * overflow);
 
   const scroll = (dir: 1 | -1) => {
     const el = track.current;
@@ -274,66 +378,61 @@ export function PartnerVoices() {
   };
 
   return (
-    <PageSection
-      id="partner-voices"
-      className={`px-6 py-16 sm:py-20 lg:px-12 lg:pb-10 lg:pt-24 ${panelBg}`}
-      contentClassName="mx-auto max-w-6xl"
-    >
-      <FadeUp className="text-center">
-        <Eyebrow>Conversations that shape Mindfries</Eyebrow>
+    <>
+      <div className="text-center">
+        <Rise p={eyebrow} y={10}>
+          <Eyebrow>Conversations that shape Mindfries</Eyebrow>
+        </Rise>
         <Heading className="mx-auto mt-4 max-w-5xl text-[clamp(2.1rem,3.8vw,3.4rem)]">
-          Founders and leaders <Accent>we&rsquo;ve spoken with</Accent>
+          <MaskLine p={head}>
+            Founders and leaders <Accent>we&rsquo;ve spoken with</Accent>
+          </MaskLine>
         </Heading>
-        <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-dim sm:text-base">
-          We&rsquo;re grateful to the builders who shared their time and feedback on engineering hiring and
-          assessment. Here&rsquo;s what each of them told us.
-        </p>
-      </FadeUp>
+        <Rise p={line} y={16}>
+          <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-dim sm:text-base">
+            We&rsquo;re grateful to the builders who shared their time and feedback on engineering hiring and
+            assessment. Here&rsquo;s what each of them told us.
+          </p>
+        </Rise>
+      </div>
 
       <div className="mt-12 flex items-center gap-3 sm:gap-4">
-        <div className="hidden sm:block">
+        <div className="hidden sm:block lg:hidden">
           <ArrowButton dir="prev" onClick={() => scroll(-1)} />
         </div>
 
-        <div
-          ref={track}
-          className="flex min-w-0 flex-1 snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-4 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {partners.map((p, i) => (
-            <motion.article
-              key={p.name}
-              data-card
-              className="flex w-[85%] shrink-0 snap-start flex-col rounded-3xl border border-hair bg-white/85 p-6 shadow-[0_24px_50px_-34px_rgba(76,29,149,0.45)] sm:w-[calc((100%-20px)/2)] lg:w-[calc((100%-40px)/3)] xl:w-[calc((100%-60px)/4)]"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.08, ease }}
-            >
-              <div className="flex items-end justify-between">
-                <Avatar name={p.name} grad={p.grad} />
-                <CompanyLogo company={p.company} size={36} />
-              </div>
-              <p className="mt-5 font-serif text-[19px] font-semibold leading-tight text-[#1e1b4b]">{p.name}</p>
-              <p className="mt-1 text-[13px] text-dim">
-                {p.role} · <span className="font-medium text-ink/80">{p.company}</span>
-              </p>
-              <p className="mt-4 flex-1 text-[13.5px] leading-relaxed text-ink/75">{p.note}</p>
-              <span className="mt-5 w-fit rounded-full bg-violet-50 px-3 py-1 text-[12px] font-medium text-violet-700">
-                Design partner
-              </span>
-            </motion.article>
-          ))}
+        <div ref={box} className="min-w-0 flex-1">
+          <motion.div
+            ref={track}
+            style={ride ? { x } : undefined}
+            className={
+              ride
+                ? "flex gap-5 pb-4 pt-2"
+                : "flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-4 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            }
+          >
+            {partners.map((partner, i) => (
+              <VoiceCard key={partner.name} p={p} i={i} partner={partner} />
+            ))}
+          </motion.div>
         </div>
 
-        <div className="hidden sm:block">
+        <div className="hidden sm:block lg:hidden">
           <ArrowButton dir="next" onClick={() => scroll(1)} />
         </div>
       </div>
-      <div className="mt-2 flex justify-center gap-3 sm:hidden">
-        <ArrowButton dir="prev" onClick={() => scroll(-1)} />
-        <ArrowButton dir="next" onClick={() => scroll(1)} />
-      </div>
-    </PageSection>
+
+      {ride ? (
+        <div className="mx-auto mt-6 h-1 w-48 overflow-hidden rounded-full bg-violet-100">
+          <motion.span style={{ scaleX: travel }} className="block h-full origin-left rounded-full bg-violet-500" />
+        </div>
+      ) : (
+        <div className="mt-2 flex justify-center gap-3 sm:hidden">
+          <ArrowButton dir="prev" onClick={() => scroll(-1)} />
+          <ArrowButton dir="next" onClick={() => scroll(1)} />
+        </div>
+      )}
+    </>
   );
 }
 
@@ -348,40 +447,102 @@ const orbit = [
   { x: 8, y: 30 },
 ];
 
+// Where each company tile starts before it flies into the row (px and degrees)
+const scatter = [
+  { x: -420, y: -170, r: -18 },
+  { x: 260, y: -230, r: 14 },
+  { x: -140, y: 210, r: 10 },
+  { x: 430, y: 130, r: -12 },
+  { x: -380, y: 190, r: 16 },
+];
+
+function PartnerTile({ p, i, partner }: { p: MotionValue<number>; i: number; partner: Partner }) {
+  const t = useBeat(p, 0.16 + i * 0.05, 0.42 + i * 0.05);
+  const from = scatter[i % scatter.length];
+  const x = useTransform(t, [0, 1], [from.x, 0]);
+  const y = useTransform(t, [0, 1], [from.y, 0]);
+  const rotate = useTransform(t, [0, 1], [from.r, 0]);
+  const scale = useTransform(t, [0, 1], [0.6, 1]);
+  return (
+    <motion.li
+      style={{ opacity: t, x, y, rotate, scale }}
+      className="flex flex-col items-center justify-center rounded-2xl border border-hair bg-white/85 px-4 py-5 text-center shadow-[0_18px_40px_-30px_rgba(76,29,149,0.45)]"
+    >
+      <CompanyLogo company={partner.company} size={40} className="mb-2.5 !rounded-xl" />
+      <span className="font-serif text-[22px] font-semibold tracking-tight text-[#1e1b4b]">{partner.company}</span>
+      <span className="mt-1 text-[12px] text-dim">
+        {partner.name} · {partner.role}
+      </span>
+    </motion.li>
+  );
+}
+
+function OrbitAvatar({ p, i, spin, partner }: { p: MotionValue<number>; i: number; spin: MotionValue<number>; partner: Partner }) {
+  const t = useBeat(p, 0.6 + i * 0.04, 0.72 + i * 0.04);
+  const scale = useTransform(t, [0, 1], [0.4, 1]);
+  const upright = useTransform(spin, (v) => -v); // cancel the ring's spin so logos stay level
+  return (
+    <span
+      className={`absolute -translate-x-1/2 -translate-y-1/2 ${["float-a", "float-b", "float-c"][i % 3]}`}
+      style={{ left: `${orbit[i].x}%`, top: `${orbit[i].y}%` }}
+      title={partner.company}
+    >
+      <motion.span
+        style={{ opacity: t, scale, rotate: upright }}
+        className="grid h-16 w-16 place-items-center rounded-full bg-white shadow-[0_12px_28px_-10px_rgba(76,29,149,0.45)] ring-4 ring-white"
+      >
+        <CompanyLogo company={partner.company} size={40} className="!rounded-xl !border-0 !shadow-none" />
+      </motion.span>
+    </span>
+  );
+}
+
+/**
+ * Scene "Assemble": the partner tiles fly in from scattered positions and
+ * lock into a row, then the join card rises and its ring of partner logos
+ * spins into place around the Mindfries mark.
+ */
 export function JoinConversation() {
   return (
-    <PageSection
-      id="join"
-      className={`px-6 py-16 sm:py-20 lg:px-12 lg:pb-10 lg:pt-24 ${panelBg}`}
-      contentClassName="mx-auto max-w-6xl"
-    >
-      <FadeUp className="text-center">
-        <Eyebrow>Our design partners</Eyebrow>
+    <Scene id="join" length={2.4} className={stage}>
+      <Fit>
+        <div className="mx-auto max-w-6xl">
+          <JoinConversationContent />
+        </div>
+      </Fit>
+    </Scene>
+  );
+}
+
+function JoinConversationContent() {
+  const p = useScene();
+  const eyebrow = useBeat(p, 0, 0.1);
+  const head = useBeat(p, 0.02, 0.22);
+  const card = useBeat(p, 0.48, 0.66);
+  const ring = useBeat(p, 0.56, 0.86);
+  const spin = useTransform(ring, [0, 1], [-140, 0]);
+  const mark = useTransform(useBeat(p, 0.56, 0.7), [0, 1], [0.5, 1]);
+
+  return (
+    <>
+      <div className="text-center">
+        <Rise p={eyebrow} y={10}>
+          <Eyebrow>Our design partners</Eyebrow>
+        </Rise>
         <Heading className="mx-auto mt-4 max-w-5xl text-[clamp(2.1rem,4.2vw,3.75rem)]">
-          The teams <Accent>building it</Accent> with us
+          <MaskLine p={head}>
+            The teams <Accent>building it</Accent> with us
+          </MaskLine>
         </Heading>
-      </FadeUp>
+      </div>
 
       <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        {partners.map((p, i) => (
-          <motion.li
-            key={p.company}
-            className="flex flex-col items-center justify-center rounded-2xl border border-hair bg-white/85 px-4 py-5 text-center shadow-[0_18px_40px_-30px_rgba(76,29,149,0.45)]"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: i * 0.07, ease }}
-          >
-            <CompanyLogo company={p.company} size={40} className="mb-2.5 !rounded-xl" />
-            <span className="font-serif text-[22px] font-semibold tracking-tight text-[#1e1b4b]">{p.company}</span>
-            <span className="mt-1 text-[12px] text-dim">
-              {p.name} · {p.role}
-            </span>
-          </motion.li>
+        {partners.map((partner, i) => (
+          <PartnerTile key={partner.company} p={p} i={i} partner={partner} />
         ))}
       </ul>
 
-      <FadeUp delay={0.15} className="mt-8">
+      <Rise p={card} y={80} className="mt-8">
         <div className="relative grid items-center gap-10 overflow-hidden rounded-[2rem] bg-gradient-to-br from-violet-50 via-white to-violet-100/80 p-8 shadow-[0_30px_60px_-36px_rgba(76,29,149,0.45)] sm:p-10 lg:grid-cols-[1.2fr_1fr]">
           <span className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-violet-300/25 blur-3xl" />
           <div className="relative">
@@ -410,31 +571,23 @@ export function JoinConversation() {
             </div>
           </div>
 
-          {/* partners orbiting the logo */}
+          {/* partners orbiting the logo; the ring spins into place */}
           <div className="relative mx-auto aspect-square w-full max-w-[280px]">
             <span className="absolute inset-[14%] rounded-full border border-dashed border-violet-300/70" />
-            <span className="absolute left-1/2 top-1/2 grid h-24 w-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white shadow-[0_20px_44px_-16px_rgba(124,58,237,0.55)] ring-8 ring-violet-100/70">
+            <motion.span
+              style={{ scale: mark }}
+              className="absolute left-1/2 top-1/2 -ml-12 -mt-12 grid h-24 w-24 place-items-center rounded-full bg-white shadow-[0_20px_44px_-16px_rgba(124,58,237,0.55)] ring-8 ring-violet-100/70"
+            >
               <Image src="/logo.png" alt="Mindfries" width={56} height={56} className="rounded-full" />
-            </span>
-            {partners.map((p, i) => (
-              <motion.span
-                key={p.name}
-                className={`absolute -translate-x-1/2 -translate-y-1/2 ${["float-a", "float-b", "float-c"][i % 3]}`}
-                style={{ left: `${orbit[i].x}%`, top: `${orbit[i].y}%` }}
-                title={p.company}
-                initial={{ opacity: 0, scale: 0.6 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-              >
-                <span className="grid h-16 w-16 place-items-center rounded-full bg-white shadow-[0_12px_28px_-10px_rgba(76,29,149,0.45)] ring-4 ring-white">
-                  <CompanyLogo company={p.company} size={40} className="!rounded-xl !border-0 !shadow-none" />
-                </span>
-              </motion.span>
-            ))}
+            </motion.span>
+            <motion.div style={{ rotate: spin }} className="absolute inset-0">
+              {partners.map((partner, i) => (
+                <OrbitAvatar key={partner.name} p={p} i={i} spin={spin} partner={partner} />
+              ))}
+            </motion.div>
           </div>
         </div>
-      </FadeUp>
-    </PageSection>
+      </Rise>
+    </>
   );
 }

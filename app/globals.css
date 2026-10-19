@@ -34,15 +34,6 @@
   border-color: var(--color-hair);
 }
 
-/* Home page on desktop: settle onto the full-screen page you stop near.
-   Proximity (not mandatory) so the stacked deck and the CTA's pinned
-   reveal can still be scrolled through freely. */
-@media (min-width: 1024px) {
-  html:has(main[data-snap]) {
-    scroll-snap-type: y proximity;
-  }
-}
-
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
