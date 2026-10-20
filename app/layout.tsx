@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
+import { GetStartedDialog } from "@/components/GetStarted";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -123,7 +124,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${sourceSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <GetStartedDialog />
+      </body>
     </html>
   );
 }

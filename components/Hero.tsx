@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import HeroDashboard from "@/components/HeroDashboard";
 import { Fit } from "./primitives";
+import { GetStartedButton } from "@/components/GetStarted";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -73,15 +74,12 @@ export default function Hero() {
             transition={{ duration: 0.7, delay: 0.5, ease }}
             className="mt-10 flex flex-col gap-3 sm:flex-row"
           >
-            <a
-              href="#access"
-              className="group inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-xl bg-[#0f172a] px-7 py-4 text-base font-medium text-white shadow-[0_14px_30px_-12px_rgba(15,23,42,0.6)] transition-transform hover:-translate-y-0.5"
-            >
-              Request access
+            <GetStartedButton className="group inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-xl bg-[#0f172a] px-7 py-4 text-base font-medium text-white shadow-[0_14px_30px_-12px_rgba(15,23,42,0.6)] transition-transform hover:-translate-y-0.5">
+              Get started
               <svg width="18" height="18" viewBox="0 0 24 24" {...stroke} className="transition-transform group-hover:translate-x-0.5" aria-hidden>
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
-            </a>
+            </GetStartedButton>
             <a
               href="#demo"
               className="inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-xl border border-hair-bright bg-white px-7 py-4 text-base font-medium text-ink transition-colors hover:bg-surface-2"
