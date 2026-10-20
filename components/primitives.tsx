@@ -166,6 +166,13 @@ export function Fit({ children, className = "" }: { children: React.ReactNode; c
 
 const SceneProgress = createContext<MotionValue<number> | null>(null);
 
+/* How slowly every scene plays. Each scene's runway is its `length` times
+   this, so a higher number means more scrolling for the same choreography.
+   SCENE_SPRING is how the animation trails the scroll: softer settles more
+   gently, so each beat stays on screen long enough to notice. */
+export const SCENE_PACE = 1.5;
+export const SCENE_SPRING = { stiffness: 60, damping: 20, mass: 0.7 };
+
 export function useDesktop() {
   const [desktop, setDesktop] = useState(false);
   useEffect(() => {
@@ -200,11 +207,11 @@ export function Scene({
   const pinned = useDesktop() && !reduce;
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.6", "end end"] });
-  const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.4 });
+  const smooth = useSpring(scrollYProgress, SCENE_SPRING);
   const finished = useMotionValue(1);
 
   return (
-    <Tag id={id} ref={ref as React.RefObject<HTMLElement & HTMLDivElement>} className="relative" style={pinned ? { height: `${length * 100}svh` } : undefined}>
+    <Tag id={id} ref={ref as React.RefObject<HTMLElement & HTMLDivElement>} className="relative" style={pinned ? { height: `${length * SCENE_PACE * 100}svh` } : undefined}>
       <div
         className={`relative overflow-hidden ${pinned ? "sticky top-0 flex h-svh flex-col" : ""} ${className}`}
         style={pinned && inset ? { top: inset, height: `calc(100svh - ${inset + 14}px)` } : undefined}
