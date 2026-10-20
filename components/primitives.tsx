@@ -170,7 +170,7 @@ const SceneProgress = createContext<MotionValue<number> | null>(null);
    this, so a higher number means more scrolling for the same choreography.
    SCENE_SPRING is how the animation trails the scroll: softer settles more
    gently, so each beat stays on screen long enough to notice. */
-export const SCENE_PACE = 1.5;
+export const SCENE_PACE = 1.75;
 export const SCENE_SPRING = { stiffness: 60, damping: 20, mass: 0.7 };
 
 export function useDesktop() {
