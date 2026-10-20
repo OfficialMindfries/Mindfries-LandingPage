@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import { GetStartedDialog } from "@/components/GetStarted";
+import { SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +20,6 @@ const geistMono = Geist_Mono({
 });
 
 // ── SEO Metadata ────────────────────────────────────────────────────────────
-const SITE_URL = "https://mindfries.vercel.app";
 const SITE_NAME = "Mindfries";
 const TITLE = "Mindfries — Hiring Intelligence, Not Another ATS";
 const DESCRIPTION =
