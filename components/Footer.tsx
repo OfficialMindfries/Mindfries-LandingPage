@@ -29,6 +29,7 @@ const cols: { title: string; links: { label: string; href?: string }[] }[] = [
     title: "Resources",
     links: [
       { label: "Pricing", href: "#pricing" },
+      { label: "CLI docs", href: "/docs" },
       { label: "Waitlist", href: "#access" },
       { label: "Privacy" },
       { label: "Security" },
