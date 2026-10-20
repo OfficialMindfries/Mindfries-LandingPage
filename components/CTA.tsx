@@ -12,6 +12,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 import WaitlistForm from "./WaitlistForm";
+import { SCENE_PACE, SCENE_SPRING } from "./primitives";
 
 /* Paste the team's Calendly link here. While it is empty, "Book a call"
    opens the waitlist form instead and the Calendly caption is hidden. */
@@ -157,7 +158,7 @@ function Glows({ p }: { p?: MotionValue<number> }) {
 /**
  * CTA — "Let's talk engineering." with its own pinned scroll scene.
  *
- * The section is ~2.4 screens tall with a sticky full-screen stage. As you
+ * The section is ~2.4 screens (times SCENE_PACE) tall with a sticky full-screen stage. As you
  * scroll through it, the stage opens from a rounded, inset card to a
  * full-bleed canvas (clip-path), the glows drift, the two headline lines
  * rise out of their masks one after the other, and the copy and actions
@@ -168,7 +169,7 @@ export default function CTA() {
   const reduce = useReducedMotion();
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const p = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.4 });
+  const p = useSpring(scrollYProgress, SCENE_SPRING);
 
   const inset = useTransform(p, [0, 0.4], [12, 0]);
   const radius = useTransform(p, [0, 0.4], [48, 0]);
@@ -189,7 +190,7 @@ export default function CTA() {
   }
 
   return (
-    <section id="access" ref={ref} className="relative" style={{ height: "240vh" }}>
+    <section id="access" ref={ref} className="relative" style={{ height: `${2.4 * SCENE_PACE * 100}vh` }}>
       <div className="sticky top-0 h-screen overflow-hidden">
         <motion.div className="absolute inset-0 bg-white" style={{ clipPath }}>
           <Glows p={p} />
