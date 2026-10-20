@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { GetStartedButton } from "@/components/GetStarted";
 
 // Absolute paths so the nav also works from /blog pages
 const links = [
@@ -60,12 +61,9 @@ export default function Nav() {
           ))}
         </nav>
 
-        <Link
-          href="/#access"
-          className="ml-1 rounded-full bg-ink px-4 py-2 text-sm font-medium text-surface transition-transform hover:-translate-y-0.5"
-        >
-          Request access
-        </Link>
+        <GetStartedButton className="ml-1 rounded-full bg-ink px-4 py-2 text-sm font-medium text-surface transition-transform hover:-translate-y-0.5">
+          Get started
+        </GetStartedButton>
 
         {/* mobile menu toggle */}
         <button

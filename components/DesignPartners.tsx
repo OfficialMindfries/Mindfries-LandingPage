@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
 import { Fit, MaskLine, Rise, Scene, useBeat, useDesktop, useScene } from "./primitives";
+import { GetStartedButton } from "@/components/GetStarted";
 
 /* ---- Design partners: three pinned scenes ----
    1. PartnersIntro    – who we're building with, by sector ("Word by word")
@@ -555,13 +556,10 @@ function JoinConversationContent() {
               real skills and fair opportunities.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#access"
-                className="inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-xl bg-[#0f172a] px-6 py-3.5 text-[15px] font-medium text-white shadow-[0_14px_30px_-12px_rgba(15,23,42,0.6)] transition-transform hover:-translate-y-0.5"
-              >
-                Request access
+              <GetStartedButton className="inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-xl bg-[#0f172a] px-6 py-3.5 text-[15px] font-medium text-white shadow-[0_14px_30px_-12px_rgba(15,23,42,0.6)] transition-transform hover:-translate-y-0.5">
+                Get started
                 <Svg size={16}><path d="M5 12h14M13 6l6 6-6 6" /></Svg>
-              </a>
+              </GetStartedButton>
               <a
                 href="#access"
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-xl border border-hair-bright bg-white px-6 py-3.5 text-[15px] font-medium text-ink transition-colors hover:bg-surface-2"

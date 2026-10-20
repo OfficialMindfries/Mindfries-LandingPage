@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Fit, MaskLine, Rise, Scene, useBeat, useScene } from "./primitives";
+import { PORTALS } from "./GetStarted";
 import {
   AnimatePresence,
   motion,
@@ -264,7 +265,8 @@ function PlanCard({
       </ul>
 
       <a
-        href="#access"
+        // A plan's "Get started" is a company signing up; "Contact sales" goes to the call section
+        href={plan.cta === "Get started" ? `${PORTALS.company.url}/signup` : "#access"}
         className={`group mt-6 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-medium transition-transform hover:-translate-y-0.5 ${
           featured
             ? "bg-[#0f172a] text-white shadow-[0_16px_34px_-14px_rgba(76,29,149,0.7)]"
